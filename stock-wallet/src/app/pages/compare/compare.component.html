@@ -1,0 +1,167 @@
+<div class="compare-container page-enter">
+  <!-- Title / Header -->
+  <div class="compare-header">
+    <div class="header-left">
+      <h1 class="page-title">Comparison Terminal</h1>
+      <p class="page-subtitle">Benchmark return percentages, multiples ratios, and AI risk distributions side-by-side.</p>
+    </div>
+    
+    <!-- Search / Add compared ticker -->
+    <div class="search-section">
+      <div class="search-wrapper glass">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (input)="onSearchInput()" 
+          placeholder="Type ticker to compare (e.g. NVDA, TSLA)..."
+          autocomplete="off">
+        
+        <!-- Search Autocomplete suggestions -->
+        <div class="autocomplete-dropdown glass-strong" *ngIf="showSuggestions && autocompleteSuggestions.length > 0">
+          <div 
+            *ngFor="let item of autocompleteSuggestions" 
+            class="suggestion-item" 
+            (click)="addTicker(item.symbol)">
+            <div class="logo-wrapper legend-logo" style="width:20px; height:20px; border-radius:4px; background:#fff; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; margin-right:8px; flex-shrink:0;">
+              <img *ngIf="getLogoUrl(item.symbol)" [src]="getLogoUrl(item.symbol)" (error)="reportBrokenLogo(item.symbol)" style="width:100%; height:100%; object-fit:contain;" [alt]="item.symbol">
+              <span *ngIf="!getLogoUrl(item.symbol)" style="font-size:9px; font-weight:800; color:#3b82f6;">{{ item.symbol.slice(0,2) }}</span>
+            </div>
+            <span class="symbol-tag">{{ item.symbol }}</span>
+            <span class="company-name">{{ item.name }}</span>
+            <span class="sector-tag">{{ item.sector }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Comparison Grid -->
+  <div class="main-grid">
+    <!-- Chart Column -->
+    <div class="chart-card glass">
+      <div class="chart-header">
+        <div class="chart-legend-items">
+          <div *ngFor="let ticker of compareTickers" class="legend-badge glass" [style.border-left-color]="stockStats[ticker].color">
+            <div class="logo-wrapper legend-logo" style="width:16px; height:16px; border-radius:4px; margin-right:6px; background:#fff; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+              <img *ngIf="getLogoUrl(ticker)" [src]="getLogoUrl(ticker)" (error)="reportBrokenLogo(ticker)" style="width:100%; height:100%; object-fit:contain;" [alt]="ticker">
+              <span *ngIf="!getLogoUrl(ticker)" style="font-size:8px; font-weight:800; color:#3b82f6;">{{ ticker.slice(0,2) }}</span>
+            </div>
+            <span class="legend-color-dot" [style.background-color]="stockStats[ticker].color"></span>
+            <span class="legend-ticker">{{ ticker }}</span>
+            <span class="legend-value" [class.up]="(stockStats[ticker].changePct || 0) >= 0" [class.down]="(stockStats[ticker].changePct || 0) < 0">
+              {{ (stockStats[ticker].changePct || 0) >= 0 ? '+' : '' }}{{ (stockStats[ticker].changePct || 0).toFixed(2) }}%
+            </span>
+            <button class="remove-btn" (click)="removeTicker(ticker)" *ngIf="compareTickers.length > 1">✕</button>
+          </div>
+        </div>
+        
+        <!-- Timeframe selectors -->
+        <div class="timeframe-buttons">
+          <button 
+            *ngFor="let tf of timeframes" 
+            class="tf-btn" 
+            [class.active]="tf === selectedTimeframe" 
+            (click)="selectTimeframe(tf)">
+            {{ tf }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Chart Content Area -->
+      <div class="chart-viewport" #chartContainer>
+        <div class="loading-overlay" *ngIf="chartLoading">
+          <div class="spinner"></div>
+          <span>Syncing financial indices history...</span>
+        </div>
+        <div class="error-overlay" *ngIf="chartError">
+          <span>⚠️ {{ chartError }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Performance advisory -->
+    <div class="ai-advisor-card glass">
+      <div class="advisor-header">
+        <span class="advisor-icon">🤖</span>
+        <h3 class="advisor-title">Comparison Terminal Co-pilot</h3>
+      </div>
+      <div class="advisor-body" [innerHTML]="aiComparisonConsensus"></div>
+    </div>
+  </div>
+
+  <!-- Metric Comparison Table -->
+  <div class="table-card glass">
+    <div class="table-header">
+      <h3>Multiples & Fundamentals Matrix</h3>
+      <p>Analyze key valuation profiles, ranges, and consensus metrics below.</p>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Company Profile</th>
+            <th class="text-end">Current Quote</th>
+            <th class="text-end">24h Change</th>
+            <th class="text-end">P/E Ratio</th>
+            <th class="text-end">Market Cap</th>
+            <th class="text-end">52-Week Range</th>
+            <th class="text-center">Analyst Rating</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ticker of compareTickers; let i = index">
+            <td>
+              <div class="profile-cell">
+                <span class="color-indicator" [style.background-color]="stockStats[ticker].color"></span>
+                <div class="logo-wrapper legend-logo" style="width:24px; height:24px; border-radius:6px; background:#fff; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; margin-right:10px; flex-shrink:0;">
+                  <img *ngIf="getLogoUrl(ticker)" [src]="getLogoUrl(ticker)" (error)="reportBrokenLogo(ticker)" style="width:100%; height:100%; object-fit:contain;" [alt]="ticker">
+                  <span *ngIf="!getLogoUrl(ticker)" style="font-size:10px; font-weight:800; color:#3b82f6;">{{ ticker.slice(0,2) }}</span>
+                </div>
+                <div>
+                  <div class="profile-ticker">{{ ticker }}</div>
+                  <div class="profile-name">{{ stockStats[ticker].name }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="text-end font-mono font-semibold">
+              ${{ (stockStats[ticker].price || 0).toFixed(2) }}
+            </td>
+            <td class="text-end font-mono" [class.up]="(stockStats[ticker].changePct || 0) >= 0" [class.down]="(stockStats[ticker].changePct || 0) < 0">
+              {{ (stockStats[ticker].changePct || 0) >= 0 ? '+' : '' }}{{ (stockStats[ticker].changePct || 0).toFixed(2) }}%
+            </td>
+            <td class="text-end font-mono">
+              {{ stockStats[ticker] ? stockStats[ticker].peRatio.toFixed(1) + 'x' : 'N/A' }}
+            </td>
+            <td class="text-end font-mono">
+              {{ stockStats[ticker] ? '$' + stockStats[ticker].marketCap.toLocaleString() + 'M' : 'N/A' }}
+            </td>
+            <td class="text-end font-mono">
+              <div class="range-wrapper">
+                <span class="range-val">${{ (stockStats[ticker].low52w || 0).toFixed(2) }}</span>
+                <div class="range-track-outer">
+                  <div class="range-track-inner" [style.left.%]="15" [style.right.%]="15"></div>
+                  <div class="range-thumb" [style.left.%]="50"></div>
+                </div>
+                <span class="range-val">${{ (stockStats[ticker].high52w || 0).toFixed(2) }}</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="badge-consensus" [class.buy]="(stockStats[ticker].consensus || '').includes('BUY')" [class.hold]="(stockStats[ticker].consensus || '').includes('HOLD')">
+                {{ stockStats[ticker].consensus }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="action-cell">
+                <a [routerLink]="['/stock', ticker]" class="btn-detail glass">Detail</a>
+                <button class="btn-remove" (click)="removeTicker(ticker)" *ngIf="compareTickers.length > 1">✕</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

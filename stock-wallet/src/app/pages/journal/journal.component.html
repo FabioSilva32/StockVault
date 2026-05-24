@@ -1,0 +1,203 @@
+<div class="page-enter">
+  <div class="container">
+
+    <!-- ── Header ── -->
+    <div class="section-header" style="margin-bottom:28px">
+      <div>
+        <h1 class="section-title">📔 Trading Journal</h1>
+        <p class="section-subtitle">Track your trades, add notes, and reflect on your investment decisions</p>
+      </div>
+    </div>
+
+    <!-- ── Stats Row ── -->
+    <div class="journal-stats-grid">
+      <div class="journal-stat glass">
+        <div class="jstat-icon">📊</div>
+        <div class="jstat-val">{{ totalTrades }}</div>
+        <div class="jstat-label">Total Trades</div>
+      </div>
+      <div class="journal-stat glass">
+        <div class="jstat-icon">🟢</div>
+        <div class="jstat-val text-positive">{{ buyCount }}</div>
+        <div class="jstat-label">Buys</div>
+      </div>
+      <div class="journal-stat glass">
+        <div class="jstat-icon">🔴</div>
+        <div class="jstat-val text-negative">{{ sellCount }}</div>
+        <div class="jstat-label">Sells</div>
+      </div>
+      <div class="journal-stat glass">
+        <div class="jstat-icon">💰</div>
+        <div class="jstat-val">${{ totalVolume | number:'1.2-2' }}</div>
+        <div class="jstat-label">Total Volume</div>
+      </div>
+      <div class="journal-stat glass">
+        <div class="jstat-icon">📈</div>
+        <div class="jstat-val">{{ mostTradedTicker }}</div>
+        <div class="jstat-label">Most Traded</div>
+      </div>
+      <div class="journal-stat glass">
+        <div class="jstat-icon">🎯</div>
+        <div class="jstat-val">${{ avgTradeSize | number:'1.0-0' }}</div>
+        <div class="jstat-label">Avg Trade Size</div>
+      </div>
+    </div>
+
+    <!-- ── Filters ── -->
+    <div class="journal-filters glass">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label class="filter-label">Action</label>
+          <div class="pill-filter">
+            <button class="pill-btn" [class.active]="filterAction === 'all'" (click)="filterAction = 'all'; applyFilters()">All</button>
+            <button class="pill-btn buy" [class.active]="filterAction === 'buy'" (click)="filterAction = 'buy'; applyFilters()">🟢 Buys</button>
+            <button class="pill-btn sell" [class.active]="filterAction === 'sell'" (click)="filterAction = 'sell'; applyFilters()">🔴 Sells</button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Mood</label>
+          <div class="pill-filter">
+            <button class="pill-btn" [class.active]="filterMood === 'all'" (click)="filterMood = 'all'; applyFilters()">All</button>
+            <button class="pill-btn" *ngFor="let m of moods" [class.active]="filterMood === m" (click)="filterMood = m; applyFilters()">
+              {{ moodIcons[m] }} {{ m | titlecase }}
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Sort By</label>
+          <select class="filter-select" [(ngModel)]="sortBy" (change)="applyFilters()">
+            <option value="date">Date</option>
+            <option value="total">Trade Value</option>
+            <option value="ticker">Ticker</option>
+          </select>
+        </div>
+
+        <div class="filter-group" style="flex:1">
+          <label class="filter-label">Search</label>
+          <input class="filter-search" type="text" [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="Search ticker, note, tag...">
+        </div>
+      </div>
+      <div class="filter-count">Showing {{ filteredEntries.length }} of {{ entries.length }} entries</div>
+    </div>
+
+    <!-- ── Empty State ── -->
+    <div *ngIf="entries.length === 0" class="empty-state" style="margin-top:40px">
+      <div class="empty-state-icon">📔</div>
+      <div class="empty-state-title">No journal entries yet</div>
+      <div class="empty-state-desc">Your journal automatically fills up as you make trades. Go buy your first stock!</div>
+      <a routerLink="/market" class="btn btn-primary" style="margin-top:24px">Explore Market</a>
+    </div>
+
+    <!-- ── Journal Entries ── -->
+    <div class="journal-list" *ngIf="filteredEntries.length > 0">
+      <div class="journal-entry glass" *ngFor="let entry of filteredEntries; trackBy: trackById">
+
+        <!-- Entry Header -->
+        <div class="entry-header">
+          <div class="entry-identity" [routerLink]="['/stock', entry.ticker]" style="cursor:pointer">
+            <div class="entry-logo">
+              <div class="logo-wrapper">
+                <img *ngIf="getLogoUrl(entry.ticker)" [src]="getLogoUrl(entry.ticker)"
+                     class="company-logo-img" (error)="reportBrokenLogo(entry.ticker)" [alt]="entry.ticker">
+                <span *ngIf="!getLogoUrl(entry.ticker)">{{ entry.ticker.slice(0,2) }}</span>
+              </div>
+            </div>
+            <div>
+              <div class="entry-ticker">{{ entry.ticker }}</div>
+              <div class="entry-company">{{ entry.company }}</div>
+            </div>
+          </div>
+
+          <div class="entry-badge" [class.buy]="entry.action === 'buy'" [class.sell]="entry.action === 'sell'">
+            {{ entry.action === 'buy' ? '🛒 BUY' : '💰 SELL' }}
+          </div>
+
+          <div class="entry-meta">
+            <div class="entry-date">{{ formatDate(entry.date) }}</div>
+            <div class="entry-total">${{ entry.total | number:'1.2-2' }}</div>
+          </div>
+
+          <button class="entry-delete-btn" (click)="deleteEntry(entry.id)" title="Delete entry">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Entry Details -->
+        <div class="entry-details">
+          <div class="detail-item">
+            <span class="detail-label">Quantity</span>
+            <span class="detail-val">{{ entry.quantity | number:'1.1-4' }} shs</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Price</span>
+            <span class="detail-val">${{ entry.price | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total</span>
+            <span class="detail-val font-bold">${{ entry.total | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- Mood Selector -->
+        <div class="entry-mood-row">
+          <span class="mood-label">How do you feel about this trade?</span>
+          <div class="mood-pills">
+            <button class="mood-btn" *ngFor="let m of moods"
+                    [class.active]="entry.mood === m"
+                    [style.--mood-color]="moodColors[m]"
+                    (click)="setMood(entry, m)">
+              {{ moodIcons[m] }} {{ m | titlecase }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="entry-tags-row">
+          <span class="mood-label">Tags</span>
+          <div class="tags-container">
+            <span class="tag-chip" *ngFor="let tag of entry.tags">
+              #{{ tag }}
+              <button class="tag-remove" (click)="removeTag(entry, tag)">✕</button>
+            </span>
+            <div class="tag-add">
+              <input class="tag-input" type="text" [(ngModel)]="newTagInput[entry.id]"
+                     placeholder="+ add tag" (keydown.enter)="addTag(entry)">
+              <button class="tag-add-btn" (click)="addTag(entry)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Note Section -->
+        <div class="entry-note-section">
+          <div class="note-header">
+            <span class="mood-label">📝 Trade Note</span>
+            <button class="note-edit-btn" (click)="entry.editingNote = !entry.editingNote">
+              {{ entry.editingNote ? 'Cancel' : 'Edit' }}
+            </button>
+          </div>
+          <div *ngIf="!entry.editingNote" class="note-display" (click)="entry.editingNote = true">
+            <span *ngIf="entry.note">{{ entry.note }}</span>
+            <span *ngIf="!entry.note" class="note-placeholder">Click to add a note about this trade...</span>
+          </div>
+          <div *ngIf="entry.editingNote" class="note-editor">
+            <textarea class="note-textarea" [(ngModel)]="entry.note"
+                      placeholder="Why did you make this trade? What was your thesis? How did you feel?"
+                      rows="4" (blur)="saveNote(entry)"></textarea>
+            <button class="btn btn-primary btn-sm" style="margin-top:8px" (click)="saveNote(entry)">Save Note</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- No filter results -->
+    <div *ngIf="entries.length > 0 && filteredEntries.length === 0" class="empty-state" style="margin-top:40px">
+      <div class="empty-state-icon">🔍</div>
+      <div class="empty-state-title">No entries match your filters</div>
+      <div class="empty-state-desc">Try adjusting your search or filter criteria</div>
+    </div>
+
+  </div>
+</div>

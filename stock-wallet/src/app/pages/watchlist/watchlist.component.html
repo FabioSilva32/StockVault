@@ -1,0 +1,122 @@
+<div class="page-enter">
+  <div class="container">
+
+    <!-- ── Page Header ── -->
+    <div class="section-header" style="margin-bottom:28px">
+      <div>
+        <h1 class="section-title">Live Alert Dashboard</h1>
+        <p class="section-subtitle">
+          {{ watchlistItems.length }} stock{{ watchlistItems.length !== 1 ? 's' : '' }} monitored in real-time
+          · <span class="live-dot-inline"></span> Live prices updating
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading skeletons -->
+    <div *ngIf="loading" class="wl-list">
+      <div class="skeleton wl-row-skeleton" *ngFor="let i of [1,2,3,4]"></div>
+    </div>
+
+    <!-- ── Alert List ── -->
+    <ng-container *ngIf="!loading && watchlistItems.length > 0">
+      <div class="wl-list">
+        <ng-container *ngFor="let item of watchlistItems">
+          <!-- Row -->
+          <div class="wl-row glass"
+               [class.price-flash-up]="item.priceFlash && item.priceDirection === 'up'"
+               [class.price-flash-down]="item.priceFlash && item.priceDirection === 'down'">
+
+            <!-- Left: Logo + Name -->
+            <div class="wl-identity" [routerLink]="['/stock', item.ticker]" style="cursor:pointer">
+              <div class="wl-logo-wrap">
+                <div class="logo-wrapper">
+                  <img *ngIf="getLogoUrl(item.ticker)" [src]="getLogoUrl(item.ticker)"
+                       class="company-logo-img" (error)="reportBrokenLogo(item.ticker)" [alt]="item.ticker">
+                  <span *ngIf="!getLogoUrl(item.ticker)">{{ item.ticker.slice(0,2) }}</span>
+                </div>
+              </div>
+              <div class="wl-name-block">
+                <div class="wl-ticker">{{ item.ticker }}</div>
+                <div class="wl-company">{{ item.company }}</div>
+              </div>
+            </div>
+
+            <!-- Center: Live Price + Change -->
+            <div class="wl-price-block">
+              <div class="wl-live-price" [class.price-up]="item.priceDirection === 'up'" [class.price-down]="item.priceDirection === 'down'">
+                <span *ngIf="item.loading" class="skeleton" style="width:80px;height:20px;display:inline-block;border-radius:4px"></span>
+                <span *ngIf="!item.loading">${{ item.price | number:'1.2-2' }}</span>
+              </div>
+              <div class="wl-change-pill" *ngIf="!item.loading"
+                   [class.up]="item.changePct >= 0" [class.down]="item.changePct < 0">
+                {{ item.changePct >= 0 ? '+' : '' }}{{ item.changePct | number:'1.2-2' }}%
+              </div>
+            </div>
+
+            <!-- Active alerts badges -->
+            <div class="wl-alerts-badges">
+              <div class="alert-badge"
+                   *ngFor="let a of item.activeAlerts; let ai = index"
+                   [class.triggered]="a.triggered"
+                   [title]="'Alert: price ' + a.condition + ' $' + a.price">
+                <span class="alert-icon">{{ a.condition === 'above' ? '▲' : '▼' }}</span>
+                <span class="alert-price">${{ a.price | number:'1.2-2' }}</span>
+                <button class="alert-remove-btn" (click)="removeAlert(item, ai)">✕</button>
+              </div>
+              <div class="no-alerts-hint" *ngIf="item.activeAlerts.length === 0">
+                No alerts
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="wl-actions">
+              <button class="btn-action alert-btn" (click)="toggleAlertPanel(item)" title="Set Price Alert">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+                Alert
+              </button>
+              <button class="btn-action compare-btn" (click)="compareWith(item.ticker)" title="Compare Stock">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 18V6M8 18V12M12 18v-9"/><path d="M3 12h18" stroke-dasharray="2 2"/></svg>
+                Compare
+              </button>
+              <button class="btn-action remove-btn" (click)="removeFromWatchlist(item.ticker)" title="Remove from watchlist">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Alert Panel (slides open inline below this row) -->
+          <div class="alert-panel glass" *ngIf="item.showAlertPanel">
+            <div class="alert-panel-header">
+              <span class="alert-panel-title">🔔 Set Price Alert — {{ item.ticker }}</span>
+              <button class="alert-panel-close" (click)="item.showAlertPanel = false">✕</button>
+            </div>
+            <div class="alert-panel-body">
+              <div class="alert-condition-pills">
+                <button class="alert-cond-btn" [class.active]="item.alertCondition === 'above'" (click)="item.alertCondition = 'above'">▲ Price Above</button>
+                <button class="alert-cond-btn" [class.active]="item.alertCondition === 'below'" (click)="item.alertCondition = 'below'">▼ Price Below</button>
+              </div>
+              <div class="alert-price-row">
+                <span class="alert-price-prefix">$</span>
+                <input class="alert-price-input" type="number" [(ngModel)]="item.alertPrice" [placeholder]="item.price.toFixed(2)" step="0.01" min="0.01">
+                <button class="btn btn-primary btn-sm" (click)="saveAlert(item)" style="white-space:nowrap">
+                  Set Alert
+                </button>
+              </div>
+              <p class="alert-hint">You'll be notified when {{ item.ticker }} goes {{ item.alertCondition }} your target price</p>
+            </div>
+          </div>
+
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && watchlistItems.length === 0" class="empty-state">
+      <div class="empty-state-icon">⭐</div>
+      <div class="empty-state-title">Your watchlist is empty</div>
+      <div class="empty-state-desc">Add stocks from the Market by clicking the ⭐ icon or from any stock detail page</div>
+      <a routerLink="/market" class="btn btn-primary" style="margin-top:24px">Explore Market</a>
+    </div>
+
+  </div>
+</div>

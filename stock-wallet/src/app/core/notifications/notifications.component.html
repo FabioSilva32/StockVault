@@ -1,0 +1,64 @@
+<div class="notifications-container">
+  <div 
+    *ngFor="let notification of notifications" 
+    class="trading212-toast" 
+    [class.up]="notification.type === 'up'"
+    [class.down]="notification.type === 'down'">
+    
+    <!-- Top Bar with Alert Badge & Close Button -->
+    <div class="toast-header">
+      <div class="alert-type-indicator">
+        <span class="bell-icon">🔔</span>
+        <span class="indicator-text">PRICE ALERT TRIGGERED</span>
+      </div>
+      <button class="close-btn" (click)="dismissNotification(notification.id)" title="Dismiss Alert">&times;</button>
+    </div>
+
+    <!-- Main Card Body -->
+    <div class="toast-body">
+      <!-- Round Stock Avatar on the Left -->
+      <div class="stock-avatar-container">
+        <div class="stock-avatar" [style.background]="getLogoUrl(notification.ticker) ? '#ffffff' : getAvatarStyle(notification.ticker).bg" [style.color]="getAvatarStyle(notification.ticker).color" style="overflow: hidden; padding: 0;">
+          <div class="logo-wrapper" style="width: 100%; height: 100%; border-radius: 50%;">
+            <img *ngIf="getLogoUrl(notification.ticker)" [src]="getLogoUrl(notification.ticker)" class="company-logo-img" (error)="reportBrokenLogo(notification.ticker)" [alt]="notification.ticker" style="border-radius: 50%; padding: 4px; object-fit: contain;">
+            <span *ngIf="!getLogoUrl(notification.ticker)">{{ getAvatarStyle(notification.ticker).abbreviation }}</span>
+          </div>
+        </div>
+        <div class="bell-badge">🔔</div>
+      </div>
+
+      <!-- Info Details on the Right -->
+      <div class="toast-details">
+        <div class="company-row">
+          <span class="company-name">{{ notification.company }}</span>
+          <span class="ticker-badge">{{ notification.ticker }}</span>
+        </div>
+        <div class="target-message">
+          Reached your target of <strong class="highlight">${{ notification.previousPrice | number: '1.2-2' }}</strong>
+        </div>
+        
+        <!-- Live Comparison Row -->
+        <div class="comparison-row">
+          <div class="price-pill target">
+            <span class="label">Target</span>
+            <span class="val">${{ notification.previousPrice | number: '1.2-2' }}</span>
+          </div>
+          <div class="price-pill current" [class.positive]="notification.type === 'up'" [class.negative]="notification.type === 'down'">
+            <span class="label">Current</span>
+            <span class="val">${{ notification.currentPrice | number: '1.2-2' }}</span>
+          </div>
+          <div class="direction-badge" [class.above]="notification.type === 'up'" [class.below]="notification.type === 'down'">
+            {{ notification.type === 'up' ? 'Above ↑' : 'Below ↓' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons Row at the Bottom -->
+    <div class="toast-actions">
+      <button class="action-btn dismiss" (click)="dismissNotification(notification.id)">Dismiss</button>
+      <button class="action-btn view-stock" (click)="viewStock(notification.ticker, notification.id)">View Stock</button>
+    </div>
+  </div>
+</div>
+

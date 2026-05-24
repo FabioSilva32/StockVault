@@ -1,0 +1,16 @@
+[
+  {
+    "ticker": "MSFT",
+    "company": "Microsoft",
+    "purchaseDate": "1/3/2026",
+    "quantity": 20,
+    "purchasePrice": 320.00
+  },
+  {
+    "ticker": "TSLA",
+    "company": "TESLA",
+    "purchaseDate": "20/3/2026",
+    "quantity": 50,
+    "purchasePrice": 220.00
+  }
+]

@@ -1,0 +1,178 @@
+<div class="page-enter">
+  <div class="container">
+
+    <div class="section-header" style="margin-bottom:24px">
+      <div>
+        <h1 class="section-title">Transaction History</h1>
+        <div class="section-subtitle">All your buy and sell events</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-ghost btn-sm" *ngIf="!loading && transactions.length > 0" (click)="exportCsv()" title="Download CSV">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn btn-ghost btn-sm" (click)="load()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Period P&L Strip -->
+    <div class="period-pnl-strip glass" *ngIf="!loading && transactions.length > 0" style="margin-bottom:16px">
+      <div class="period-pnl-item">
+        <div class="period-label">Today</div>
+        <div class="period-count">{{ periodCount(1) }} trades</div>
+        <div class="period-value" [class.text-positive]="periodPnl(1) >= 0" [class.text-negative]="periodPnl(1) < 0">
+          {{ periodPnl(1) >= 0 ? '+' : '' }}${{ periodPnl(1) | number:'1.2-2' }}
+        </div>
+      </div>
+      <div class="period-pnl-divider"></div>
+      <div class="period-pnl-item">
+        <div class="period-label">This Week</div>
+        <div class="period-count">{{ periodCount(7) }} trades</div>
+        <div class="period-value" [class.text-positive]="periodPnl(7) >= 0" [class.text-negative]="periodPnl(7) < 0">
+          {{ periodPnl(7) >= 0 ? '+' : '' }}${{ periodPnl(7) | number:'1.2-2' }}
+        </div>
+      </div>
+      <div class="period-pnl-divider"></div>
+      <div class="period-pnl-item">
+        <div class="period-label">This Month</div>
+        <div class="period-count">{{ periodCount(30) }} trades</div>
+        <div class="period-value" [class.text-positive]="periodPnl(30) >= 0" [class.text-negative]="periodPnl(30) < 0">
+          {{ periodPnl(30) >= 0 ? '+' : '' }}${{ periodPnl(30) | number:'1.2-2' }}
+        </div>
+      </div>
+      <div class="period-pnl-divider"></div>
+      <div class="period-pnl-item">
+        <div class="period-label">All Time</div>
+        <div class="period-count">{{ transactions.length }} trades</div>
+        <div class="period-value" [class.text-positive]="(totalSold()-totalBought()) >= 0" [class.text-negative]="(totalSold()-totalBought()) < 0">
+          {{ (totalSold()-totalBought()) >= 0 ? '+' : '' }}${{ (totalSold()-totalBought()) | number:'1.2-2' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Strip -->
+    <div class="tx-summary glass" *ngIf="!loading && transactions.length > 0">
+      <div class="tx-summary-item">
+        <div class="tx-summary-label">Total Transactions</div>
+        <div class="tx-summary-value">{{ transactions.length }}</div>
+      </div>
+      <div class="tx-summary-divider"></div>
+      <div class="tx-summary-item">
+        <div class="tx-summary-label">Total Bought</div>
+        <div class="tx-summary-value text-positive">${{ totalBought() | number:'1.2-2' }}</div>
+      </div>
+      <div class="tx-summary-divider"></div>
+      <div class="tx-summary-item">
+        <div class="tx-summary-label">Total Sold</div>
+        <div class="tx-summary-value text-negative">${{ totalSold() | number:'1.2-2' }}</div>
+      </div>
+      <div class="tx-summary-divider"></div>
+      <div class="tx-summary-item">
+        <div class="tx-summary-label">Net Flow</div>
+        <div class="tx-summary-value" [class.text-positive]="totalBought()-totalSold() <= 0" [class.text-negative]="totalBought()-totalSold() > 0">
+          {{ (totalBought() - totalSold()) > 0 ? '-' : '+' }}${{ (totalBought() - totalSold() | number:'1.2-2') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="tx-filters glass" *ngIf="!loading && transactions.length > 0">
+      <div class="filter-group">
+        <span class="filter-label">Type</span>
+        <div class="filter-chips">
+          <button class="chip" [class.active]="filterType==='all'" (click)="filterType='all'">All</button>
+          <button class="chip chip-buy" [class.active]="filterType==='buy'" (click)="filterType='buy'">Buy</button>
+          <button class="chip chip-sell" [class.active]="filterType==='sell'" (click)="filterType='sell'">Sell</button>
+        </div>
+      </div>
+      <div class="filter-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Filter by ticker..." [(ngModel)]="filterTicker" />
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="tx-table-wrap glass">
+      <div class="skeleton tx-skeleton" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !loading" class="empty-state" style="margin-top:32px">
+      <div class="empty-state-icon">⚠️</div>
+      <div class="empty-state-title">{{ error }}</div>
+      <button class="btn btn-primary" style="margin-top:16px" (click)="load()">Retry</button>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && !error && transactions.length === 0" class="empty-state" style="margin-top:32px">
+      <div class="empty-state-icon">🧾</div>
+      <div class="empty-state-title">No transactions yet</div>
+      <div class="empty-state-desc">Buy or sell stocks to see your history here</div>
+      <a routerLink="/market" class="btn btn-primary" style="margin-top:20px">Go to Market</a>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="tx-table-wrap glass" *ngIf="!loading && !error && transactions.length > 0">
+      <table class="sv-table tx-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th class="sortable" (click)="setSort('ticker')">
+              Asset
+              <span class="sort-icon" [class.active]="sortBy==='ticker'">{{ sortBy==='ticker' ? (sortDir==='asc' ? '↑' : '↓') : '⇅' }}</span>
+            </th>
+            <th>Qty</th>
+            <th>Price / Share</th>
+            <th class="sortable" (click)="setSort('total')">
+              Total
+              <span class="sort-icon" [class.active]="sortBy==='total'">{{ sortBy==='total' ? (sortDir==='asc' ? '↑' : '↓') : '⇅' }}</span>
+            </th>
+            <th class="sortable" (click)="setSort('date')">
+              Date
+              <span class="sort-icon" [class.active]="sortBy==='date'">{{ sortBy==='date' ? (sortDir==='asc' ? '↑' : '↓') : '⇅' }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of filteredTransactions; trackBy: trackById" [routerLink]="['/stock', t.ticker]" class="tx-row">
+            <td>
+              <span class="pill" [class.pill-buy]="t.type==='buy'" [class.pill-sell]="t.type==='sell'">
+                {{ t.type === 'buy' ? '↑ BUY' : '↓ SELL' }}
+              </span>
+            </td>
+            <td>
+              <div class="ticker-badge">
+                <div class="ticker-icon-sm">
+                  <div class="logo-wrapper">
+                    <img *ngIf="getLogoUrl(t.ticker)" [src]="getLogoUrl(t.ticker)" class="company-logo-img" (error)="reportBrokenLogo(t.ticker)" [alt]="t.ticker">
+                    <span *ngIf="!getLogoUrl(t.ticker)">{{ t.ticker.slice(0,2) }}</span>
+                  </div>
+                </div>
+                <div class="ticker-info">
+                  <span class="ticker-symbol">{{ t.ticker }}</span>
+                  <span class="ticker-company">{{ t.company }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="price">{{ t.quantity }}</td>
+            <td class="price">${{ t.price | number:'1.2-2' }}</td>
+            <td class="price" [class.text-negative]="t.type==='buy'" [class.text-positive]="t.type==='sell'">
+              {{ t.type === 'buy' ? '-' : '+' }}${{ t.total | number:'1.2-2' }}
+            </td>
+            <td class="tx-date-cell">
+              <div class="tx-date-day">{{ t.date | date:'MMM d, y' }}</div>
+              <div class="tx-date-time">{{ t.date | date:'HH:mm' }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tx-count" *ngIf="filteredTransactions.length !== transactions.length">
+        Showing {{ filteredTransactions.length }} of {{ transactions.length }} transactions
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,330 @@
+.notifications-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 10000; /* Float over all content */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  pointer-events: none;
+}
+
+.trading212-toast {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(18, 22, 34, 0.96);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.1);
+  pointer-events: all;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation: 
+    trading212SlideIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, 
+    trading212GlowPulse 3s infinite alternate;
+}
+
+.trading212-toast:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 158, 11, 0.2);
+}
+
+@keyframes trading212SlideIn {
+  from {
+    transform: translateX(125%) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes trading212GlowPulse {
+  0% {
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.25);
+  }
+  100% {
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+}
+
+/* Toast Header Bar */
+.toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.alert-type-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bell-icon {
+  font-size: 12px;
+  animation: bellWobble 1.5s infinite ease-in-out;
+}
+
+@keyframes bellWobble {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(-15deg); }
+  30% { transform: rotate(12deg); }
+  45% { transform: rotate(-10deg); }
+  60% { transform: rotate(8deg); }
+  75% { transform: rotate(-4deg); }
+}
+
+.indicator-text {
+  font-size: 9.5px;
+  font-weight: 850;
+  color: #f59e0b;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #f1f5f9;
+}
+
+/* Toast Card Body */
+.toast-body {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Stock Avatar Style */
+.stock-avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.stock-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bell-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f59e0b;
+  border: 2px solid #121622;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Info details column */
+.toast-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.company-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.company-name {
+  font-size: 13.5px;
+  font-weight: 750;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.ticker-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+
+.target-message {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 6px 0 10px 0;
+  line-height: 1.4;
+}
+
+.target-message .highlight {
+  color: #f59e0b;
+  font-weight: 750;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+/* Price comparison pills row */
+.comparison-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.price-pill {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 4px 10px;
+  min-width: 75px;
+}
+
+.price-pill .label {
+  font-size: 8px;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.price-pill .val {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #e2e8f0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Color codes for current price matches */
+.price-pill.current.positive {
+  background: rgba(0, 211, 149, 0.05);
+  border-color: rgba(0, 211, 149, 0.15);
+}
+.price-pill.current.positive .val {
+  color: #00d395;
+}
+
+.price-pill.current.negative {
+  background: rgba(255, 69, 96, 0.05);
+  border-color: rgba(255, 69, 96, 0.15);
+}
+.price-pill.current.negative .val {
+  color: #ff4560;
+}
+
+.direction-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 4.5px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  height: fit-content;
+}
+
+.direction-badge.above {
+  background: rgba(0, 211, 149, 0.12);
+  color: #00d395;
+  border: 1px solid rgba(0, 211, 149, 0.25);
+}
+
+.direction-badge.below {
+  background: rgba(255, 69, 96, 0.12);
+  color: #ff4560;
+  border: 1px solid rgba(255, 69, 96, 0.25);
+}
+
+/* CTA buttons row */
+.toast-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.action-btn {
+  font-size: 11.5px;
+  font-weight: 750;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  outline: none;
+}
+
+.action-btn.dismiss {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.dismiss:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.view-stock {
+  background: #f59e0b;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.action-btn.view-stock:hover {
+  background: #fbbf24;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+}
+
+.action-btn.view-stock:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .notifications-container {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+    top: 70px;
+  }
+}
+

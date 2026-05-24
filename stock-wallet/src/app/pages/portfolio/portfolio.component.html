@@ -1,0 +1,499 @@
+<!-- Toast Notification -->
+<div class="toast" [class.toast-success]="toastType==='success'" [class.toast-error]="toastType==='error'" *ngIf="toastMsg">
+  <span class="toast-icon">{{ toastType === 'success' ? '✅' : '❌' }}</span>
+  <span>{{ toastMsg }}</span>
+</div>
+
+<!-- Buy/Sell Modal -->
+<app-buy-sell-modal
+  *ngIf="showModal"
+  [mode]="modalMode"
+  [ticker]="modalTicker"
+  [company]="modalCompany"
+  [holding]="modalHolding"
+  (close)="showModal = false"
+  (success)="onModalSuccess()">
+</app-buy-sell-modal>
+
+<!-- Virtual Cash (Buying Power) Drawer -->
+<div class="cash-drawer-overlay" *ngIf="showCashDrawer" (click)="showCashDrawer = false">
+  <div class="cash-drawer glass-strong" (click)="$event.stopPropagation()">
+    <div class="drawer-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">{{ cashDrawerMode === 'deposit' ? '🏦' : '🏧' }}</span>
+        <h2 class="drawer-title">{{ cashDrawerMode === 'deposit' ? ('portfolio.deposit' | translate) : ('portfolio.withdraw' | translate) }}</h2>
+      </div>
+      <button class="drawer-close" (click)="showCashDrawer = false">✕</button>
+    </div>
+
+    <p class="drawer-subtitle">
+      Simulate an instant wire transfer to adjust your virtual buying power.
+    </p>
+
+    <div class="drawer-balance-card glass">
+      <span class="drawer-balance-label">{{ 'portfolio.buying_power' | translate }}</span>
+      <span class="drawer-balance-val price">${{ cashBalance | number:'1.2-2' }}</span>
+    </div>
+
+    <div class="form-group" style="margin-top:20px">
+      <label class="form-label">Amount (USD)</label>
+      <div class="input-prefix-wrapper">
+        <span class="input-prefix">$</span>
+        <input
+          class="form-control"
+          type="number"
+          [(ngModel)]="cashAmount"
+          placeholder="0.00"
+          min="1"
+          step="100">
+      </div>
+    </div>
+
+    <div class="drawer-msg-box">
+      <div class="error-message" *ngIf="cashDrawerError">❌ {{ cashDrawerError }}</div>
+      <div class="success-message" *ngIf="cashDrawerSuccess">✅ {{ cashDrawerSuccess }}</div>
+    </div>
+
+    <div class="drawer-actions">
+      <button class="btn btn-primary drawer-btn" (click)="submitCashTransaction()">
+        Confirm {{ cashDrawerMode === 'deposit' ? ('portfolio.deposit' | translate) : ('portfolio.withdraw' | translate) }}
+      </button>
+      <button class="btn btn-ghost drawer-btn" style="margin-top:10px" (click)="cashDrawerMode = (cashDrawerMode === 'deposit' ? 'withdraw' : 'deposit'); cashDrawerError=''; cashDrawerSuccess=''">
+        Switch to {{ cashDrawerMode === 'deposit' ? ('portfolio.withdraw' | translate) : ('portfolio.deposit' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page-enter">
+  <div class="container">
+
+    <!-- ── Loading State ── -->
+    <div *ngIf="loading" class="loading-grid loading-grid-top">
+      <div class="skeleton card-skeleton" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+    <div *ngIf="loading" style="margin-top:16px">
+      <div class="skeleton table-skeleton"></div>
+    </div>
+
+    <!-- ── Error State ── -->
+    <div *ngIf="error && !loading" class="empty-state">
+      <div class="empty-state-icon">⚠️</div>
+      <div class="empty-state-title">{{ error }}</div>
+      <div class="empty-state-desc">Make sure the backend server is running on port 3000</div>
+      <button class="btn btn-primary" style="margin-top:20px" (click)="loadData()">Retry</button>
+    </div>
+
+    <ng-container *ngIf="!loading && !error">
+
+      <!-- ── Portfolio Value History Chart ── -->
+      <div class="portfolio-chart-section glass">
+        <div class="chart-header">
+          <span class="chart-header-label">{{ 'portfolio.net_assets' | translate }}</span>
+          <h1 class="chart-header-value price">
+            ${{ (hoveredValue !== null ? hoveredValue : netAssets) | number:'1.2-2' }}
+          </h1>
+          <div class="chart-header-perf" [class.text-positive]="(hoveredChange !== null ? hoveredChange : chartTimeframeGainLoss) >= 0" [class.text-negative]="(hoveredChange !== null ? hoveredChange : chartTimeframeGainLoss) < 0">
+            {{ (hoveredChange !== null ? hoveredChange : chartTimeframeGainLoss) >= 0 ? '+' : '' }}${{ (hoveredChange !== null ? hoveredChange : chartTimeframeGainLoss) | number:'1.2-2' }}
+            ({{ (hoveredChangePct !== null ? hoveredChangePct : chartTimeframeGainLossPct) >= 0 ? '+' : '' }}{{ (hoveredChangePct !== null ? hoveredChangePct : chartTimeframeGainLossPct) | number:'1.2-2' }}%)
+            <span class="timeframe-label">{{ hoveredDate ? hoveredDate : ('past ' + selectedTimeframe) }}</span>
+          </div>
+        </div>
+
+        <div class="portfolio-chart-container-wrap">
+          <div *ngIf="chartLoading" class="chart-loading">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+            Loading history…
+          </div>
+          <div class="portfolio-chart-canvas" #portfolioChartContainer [style.display]="chartLoading ? 'none' : 'block'"></div>
+        </div>
+
+        <div class="timeframe-selector">
+          <button
+            *ngFor="let tf of timeframes"
+            class="tf-btn"
+            [class.active]="tf === selectedTimeframe"
+            (click)="loadPortfolioHistory(tf)">
+            {{ tf }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Consolidated Summary Grid (5 columns) ── -->
+      <div class="summary-grid">
+        <!-- 1. Net Assets -->
+        <div class="summary-card glass accent">
+          <div class="summary-label">{{ 'portfolio.net_assets' | translate }}</div>
+          <div class="summary-value price">${{ netAssets | number:'1.2-2' }}</div>
+          <div class="summary-sub">Cash + Stock positions</div>
+        </div>
+        <!-- 2. Stocks Value -->
+        <div class="summary-card glass">
+          <div class="summary-label">{{ 'portfolio.positions' | translate }}</div>
+          <div class="summary-value price">${{ totalValue | number:'1.2-2' }}</div>
+          <div class="summary-sub">Invested: ${{ totalInvested | number:'1.2-2' }}</div>
+        </div>
+        <!-- 3. Cash / Buying Power -->
+        <div class="summary-card glass gold">
+          <div class="summary-label">{{ 'portfolio.buying_power' | translate }}</div>
+          <div class="summary-value price">${{ cashBalance | number:'1.2-2' }}</div>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;padding:4px 8px;font-size:11px" (click)="openCashDrawer('deposit')">
+              {{ 'portfolio.deposit' | translate }}
+            </button>
+            <button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;padding:4px 8px;font-size:11px" (click)="openCashDrawer('withdraw')">
+              {{ 'portfolio.withdraw' | translate }}
+            </button>
+          </div>
+        </div>
+        <!-- 4. P&L -->
+        <div class="summary-card glass" [class.positive]="totalGainLoss >= 0" [class.negative]="totalGainLoss < 0">
+          <div class="summary-label">{{ 'portfolio.total_pl' | translate }}</div>
+          <div class="summary-value price" [class]="varClass(totalGainLoss)">
+            {{ sign(totalGainLoss) }}${{ totalGainLoss | number:'1.2-2' }}
+          </div>
+          <div class="summary-sub" [class]="varClass(totalGainLossPct)">
+            {{ sign(totalGainLossPct) }}{{ totalGainLossPct | number:'1.2-2' }}%
+          </div>
+        </div>
+        <!-- 5. Best Performer -->
+        <div class="summary-card glass gold">
+          <div class="summary-label">{{ 'portfolio.best_position' | translate }}</div>
+          <ng-container *ngIf="holdings.length > 0">
+            <div class="summary-value" style="font-size:22px">{{ bestHolder?.ticker }}</div>
+            <div class="summary-sub text-positive" *ngIf="bestHolder">
+              {{ sign(bestHolder.gainLossPct) }}{{ bestHolder.gainLossPct | number:'1.2-2' }}%
+            </div>
+          </ng-container>
+          <div class="summary-sub" *ngIf="holdings.length === 0">—</div>
+        </div>
+      </div>
+
+      <!-- ── Asset Allocation ── -->
+      <div *ngIf="holdings.length > 0" class="section-card glass" style="margin-bottom: 20px;">
+        <div class="section-header">
+          <div>
+            <div class="section-title">{{ 'portfolio.diversity' | translate }}</div>
+            <div class="section-subtitle">{{ 'portfolio.diversity_sub' | translate }}</div>
+          </div>
+        </div>
+        <div class="diversity-grid">
+          <div class="diversity-chart-wrap">
+            <div class="diversity-chart" [style.background]="diversityBackground"></div>
+            <div class="donut-center">
+              <div class="donut-center-label">Sectors</div>
+              <div class="donut-center-value">{{ sectorAllocation.length }}</div>
+            </div>
+          </div>
+          <div class="diversity-legend">
+            <div class="legend-item" *ngFor="let item of sectorAllocation">
+              <span class="legend-dot" [style.background]="item.color"></span>
+              <div>
+                <div class="legend-title">
+                  {{ item.sector }}
+                  <span class="legend-tickers">({{ item.tickers.join(', ') }})</span>
+                </div>
+                <div class="legend-sub">{{ item.pct | number:'1.1-1' }}% · ${{ item.value | number:'1.2-2' }}</div>
+              </div>
+              <div style="margin-left:auto">
+                <div class="alloc-bar-track" style="width:80px">
+                  <div class="alloc-bar-segment" [style.width.%]="item.pct" [style.background]="item.color"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Portfolio Risk & Dividend Audit Section ── -->
+      <div *ngIf="holdings.length > 0" class="audit-grid" style="margin-bottom: 20px;">
+        <!-- Left: Risk Assessment -->
+        <div class="section-card glass risk-card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">📊 {{ 'portfolio.risk_audit' | translate }}</div>
+              <div class="section-subtitle">{{ 'portfolio.risk_sub' | translate }}</div>
+            </div>
+          </div>
+          <div class="risk-content">
+            <div class="risk-gauge-container">
+              <div class="risk-gauge-track">
+                <div class="risk-gauge-bar" [style.width.%]="riskScore * 10" [class]="riskClass"></div>
+              </div>
+              <div class="risk-score-wrapper">
+                <span class="risk-score-value">{{ riskScore | number:'1.1-1' }}</span>
+                <span class="risk-score-label">/ 10</span>
+                <span class="risk-badge" [class]="riskClass">{{ riskLevel }}</span>
+              </div>
+            </div>
+            <div class="risk-breakdown">
+              <div class="risk-breakdown-row">
+                <span class="risk-sub-label">{{ 'portfolio.sector_concentration' | translate }}</span>
+                <span class="value">{{ sectorRiskScore | number:'1.1-1' }}/10</span>
+              </div>
+              <div class="risk-breakdown-row">
+                <span class="risk-sub-label">{{ 'portfolio.weighted_volatility' | translate }}</span>
+                <span class="value">{{ volRiskScore | number:'1.1-1' }}/10</span>
+              </div>
+              <div class="risk-analysis">
+                <p class="analysis-text">{{ riskAnalysisText }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Dividend Tracker -->
+        <div class="section-card glass dividend-card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">💸 {{ 'portfolio.dividend_tracker' | translate }}</div>
+              <div class="section-subtitle">{{ 'portfolio.dividend_sub' | translate }}</div>
+            </div>
+          </div>
+          <div class="dividend-content">
+            <div class="dividend-grid-stats">
+              <div class="dividend-stat">
+                <span class="label">{{ 'portfolio.est_annual_dividends' | translate }}</span>
+                <span class="value price text-positive">${{ projectedDividends | number:'1.2-2' }}</span>
+              </div>
+              <div class="dividend-stat">
+                <span class="label">{{ 'portfolio.avg_weighted_yield' | translate }}</span>
+                <span class="value">{{ averageYield | number:'1.2-2' }}%</span>
+              </div>
+            </div>
+            
+            <div class="dividend-table-wrap">
+              <table class="dividend-mini-table">
+                <thead>
+                  <tr>
+                    <th>{{ 'portfolio.asset' | translate }}</th>
+                    <th>{{ 'portfolio.yield' | translate }}</th>
+                    <th style="text-align:right">{{ 'portfolio.annual_est' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of dividendHoldings">
+                    <td>
+                      <span class="ticker">{{ item.ticker }}</span>
+                    </td>
+                    <td>{{ item.yield | number:'1.2-2' }}%</td>
+                    <td style="text-align:right" class="text-positive">${{ item.annualPayout | number:'1.2-2' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Performance Leaderboard ── -->
+      <div class="section-card glass" *ngIf="holdings.length > 1" style="margin-bottom: 20px;">
+        <div class="section-header">
+          <div>
+            <div class="section-title">{{ 'portfolio.leaderboard' | translate }}</div>
+            <div class="section-subtitle">{{ 'portfolio.leaderboard_subtitle' | translate }}</div>
+          </div>
+        </div>
+        <div class="leaderboard-list">
+          <div class="leaderboard-row" *ngFor="let h of leaderboardHoldings; let i = index" [routerLink]="['/stock', h.ticker]" style="cursor:pointer">
+            <div class="lb-rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
+              {{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i+1) }}
+            </div>
+            <div class="lb-logo">
+              <div class="logo-wrapper" style="width:32px;height:32px;border-radius:8px">
+                <img *ngIf="getLogoUrl(h.ticker)" [src]="getLogoUrl(h.ticker)" class="company-logo-img" (error)="reportBrokenLogo(h.ticker)" [alt]="h.ticker">
+                <span *ngIf="!getLogoUrl(h.ticker)" style="font-size:10px">{{ h.ticker.slice(0,2) }}</span>
+              </div>
+            </div>
+            <div class="lb-info">
+              <div class="lb-ticker">{{ h.ticker }}</div>
+              <div class="lb-bar-track">
+                <div class="lb-bar-fill"
+                     [class.positive-bar]="h.gainLossPct >= 0"
+                     [class.negative-bar]="h.gainLossPct < 0"
+                     [style.width]="(h.gainLossPct | number:'1.0-0') + '%'"
+                     style="max-width:100%;transition:width 1s ease"></div>
+              </div>
+            </div>
+            <div class="lb-pnl" [class]="varClass(h.gainLoss)">
+              <div class="lb-pct">{{ sign(h.gainLossPct) }}{{ h.gainLossPct | number:'1.2-2' }}%</div>
+              <div class="lb-abs">{{ sign(h.gainLoss) }}${{ h.gainLoss | number:'1.2-2' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Onboarding Card (first visit + empty portfolio) ── -->
+      <div *ngIf="isFirstVisit && holdings.length === 0" class="onboarding-card glass" style="margin-bottom:24px">
+        <button class="onboarding-dismiss" (click)="dismissOnboarding()" aria-label="Dismiss">✕</button>
+        <div class="onboarding-header">
+          <div class="onboarding-emoji">🚀</div>
+          <div>
+            <div class="onboarding-title">Welcome to StockVault!</div>
+            <div class="onboarding-sub">Your premium stock portfolio tracker. Here's how to get started:</div>
+          </div>
+        </div>
+        <div class="onboarding-steps">
+          <div class="onboarding-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">💰 Add funds</div>
+              <div class="step-desc">Click <strong>Deposit</strong> above to add virtual buying power to your account.</div>
+            </div>
+          </div>
+          <div class="onboarding-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">🌐 Browse the Market</div>
+              <div class="step-desc">Press <kbd>G</kbd> or click <strong>Market</strong> to discover thousands of real stocks & ETFs.</div>
+            </div>
+          </div>
+          <div class="onboarding-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">📈 Make your first trade</div>
+              <div class="step-desc">Click any stock and hit <strong>Buy</strong> to add it to your portfolio instantly.</div>
+            </div>
+          </div>
+        </div>
+        <div class="onboarding-actions">
+          <a routerLink="/market" class="btn btn-primary" (click)="dismissOnboarding()">Explore Market →</a>
+          <button class="btn btn-ghost" (click)="dismissOnboarding()">Got it, dismiss</button>
+        </div>
+      </div>
+
+      <!-- ── Empty Portfolio ── -->
+      <div *ngIf="holdings.length === 0 && !isFirstVisit" class="empty-state" style="margin-top:32px">
+        <div class="empty-state-icon">💼</div>
+        <div class="empty-state-title">{{ 'portfolio.empty_title' | translate }}</div>
+        <div class="empty-state-desc">{{ 'portfolio.empty_desc' | translate }}</div>
+        <a routerLink="/market" class="btn btn-primary" style="margin-top:20px">{{ 'portfolio.explore' | translate }}</a>
+      </div>
+
+      <!-- ── Holdings Table ── -->
+      <div class="section-card glass" *ngIf="holdings.length > 0">
+        <div class="section-header">
+          <div>
+            <div class="section-title">{{ 'portfolio.holdings' | translate }}</div>
+            <div class="section-subtitle">{{ 'portfolio.holdings_sub' | translate }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn btn-ghost btn-sm" (click)="loadData()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+              {{ 'btn.refresh' | translate }}
+            </button>
+            <button class="btn btn-primary btn-sm" (click)="exportPortfolioCard()" style="display:flex;align-items:center;gap:6px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              {{ 'portfolio.share_portfolio' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="sv-table">
+            <thead>
+              <tr>
+                <th>{{ 'portfolio.asset' | translate }}</th>
+                <th class="sparkline-col">7D</th>
+                <th>{{ 'portfolio.qty' | translate }}</th>
+                <th>{{ 'portfolio.avg_price' | translate }}</th>
+                <th>{{ 'portfolio.total_cost' | translate }}</th>
+                <th>{{ 'portfolio.current_value' | translate }}</th>
+                <th>{{ 'portfolio.gain_loss' | translate }}</th>
+                <th style="text-align:center">{{ 'portfolio.actions' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let h of holdings; trackBy: trackById"
+                  [routerLink]="['/stock', h.ticker]"
+                  style="cursor: pointer;">
+                <td>
+                  <div class="ticker-badge">
+                    <div class="ticker-icon">
+                      <div class="logo-wrapper">
+                        <img *ngIf="getLogoUrl(h.ticker)" [src]="getLogoUrl(h.ticker)" class="company-logo-img" (error)="reportBrokenLogo(h.ticker)" [alt]="h.ticker">
+                        <span *ngIf="!getLogoUrl(h.ticker)">{{ h.ticker.slice(0,2) }}</span>
+                      </div>
+                    </div>
+                    <div class="ticker-info">
+                      <span class="ticker-symbol">{{ h.ticker }}</span>
+                      <span class="ticker-company">{{ h.company }}</span>
+                    </div>
+                  </div>
+                </td>
+                <!-- Sparkline -->
+                <td class="sparkline-cell sparkline-col">
+                  <svg width="80" height="28" viewBox="0 0 80 28" class="sparkline-svg">
+                    <path *ngIf="getSparklinePath(h.ticker)" [attr.d]="getSparklinePath(h.ticker)" fill="none" [attr.stroke]="getSparklineColor(h.ticker)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <text *ngIf="!getSparklinePath(h.ticker)" x="40" y="16" text-anchor="middle" font-size="9" fill="#475569">loading…</text>
+                  </svg>
+                </td>
+                <td class="price">{{ h.quantity }}</td>
+                <td class="price">
+                  <div>${{ h.avgPurchasePrice | number:'1.2-2' }}</div>
+                  <div class="breakeven-chip">BE: ${{ calcBreakEven(h) | number:'1.2-2' }}</div>
+                </td>
+                <!-- Cost basis bar -->
+                <td class="price">
+                  <div>${{ h.totalCost | number:'1.2-2' }}</div>
+                  <div class="cost-basis-bar-track">
+                    <div class="cost-basis-bar-fill"
+                         [class.cb-positive]="h.currentValue >= h.totalCost"
+                         [class.cb-negative]="h.currentValue < h.totalCost"
+                         [style.width.%]="costBasisPct(h) > 100 ? 100 : costBasisPct(h)"
+                         [title]="(costBasisPct(h) | number:'1.0-0') + '% of cost'"></div>
+                  </div>
+                </td>
+                <!-- Combined Current Value & Price -->
+                <td class="price">
+                  <div style="font-weight:800">${{ h.currentValue | number:'1.2-2' }}</div>
+                  <div style="font-size:11px;color:var(--text-secondary);margin-top:2px">${{ h.currentPrice | number:'1.2-2' }} / share</div>
+                </td>
+                <!-- Combined P&L & Var % -->
+                <td class="price-perf-cell">
+                  <div class="perf-val" [class]="varClass(h.gainLoss)" style="font-weight:700">
+                    {{ sign(h.gainLoss) }}${{ h.gainLoss | number:'1.2-2' }}
+                  </div>
+                  <div style="margin-top:4px">
+                    <span class="pill pill-compact" [class.pill-up]="h.gainLossPct > 0" [class.pill-down]="h.gainLossPct < 0" [class.pill-flat]="h.gainLossPct === 0" style="padding:2px 8px;font-size:10.5px">
+                      {{ sign(h.gainLossPct) }}{{ h.gainLossPct | number:'1.2-2' }}%
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-btns">
+                    <button class="btn btn-buy btn-sm" (click)="openModal('buy', h); $event.stopPropagation()">{{ 'btn.buy' | translate }}</button>
+                    <button class="btn btn-sell btn-sm" (click)="openModal('sell', h); $event.stopPropagation()">{{ 'btn.sell' | translate }}</button>
+                    <button class="btn btn-ghost btn-sm" title="Compare" (click)="compareStock(h.ticker); $event.stopPropagation()" style="padding:4px 8px">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M16 18V6M8 18V12M12 18v-9"/><path d="M3 12h18" stroke-dasharray="2 2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" style="color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">{{ 'portfolio.total' | translate }}</td>
+                <td></td>
+                <td class="price">${{ totalInvested | number:'1.2-2' }}</td>
+                <td class="price" style="font-weight:800">${{ totalValue | number:'1.2-2' }}</td>
+                <td class="price-perf-cell">
+                  <div [class]="varClass(totalGainLoss)" style="font-weight:700">
+                    {{ sign(totalGainLoss) }}${{ totalGainLoss | number:'1.2-2' }}
+                  </div>
+                  <div style="margin-top:4px">
+                    <span class="pill pill-compact" [class.pill-up]="totalGainLossPct > 0" [class.pill-down]="totalGainLossPct < 0" [class.pill-flat]="totalGainLossPct === 0" style="padding:2px 8px;font-size:10.5px">
+                      {{ sign(totalGainLossPct) }}{{ totalGainLossPct | number:'1.2-2' }}%
+                    </span>
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

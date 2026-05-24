@@ -1,0 +1,75 @@
+<!-- Floating Action Button -->
+<button class="copilot-fab" (click)="toggleDrawer()">
+  <span>💬</span>
+  <span class="badge" *ngIf="unread"></span>
+</button>
+
+<!-- Sidebar Drawer -->
+<div class="copilot-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+  <div class="copilot-drawer glass-strong" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="drawer-header">
+      <div class="header-title-area">
+        <div class="bot-avatar">🤖</div>
+        <div class="header-info">
+          <span class="header-title">Copilot Analyst</span>
+          <span class="header-status">
+            <span class="status-dot"></span>
+            <span>Online</span>
+          </span>
+        </div>
+      </div>
+      <button class="drawer-close" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <!-- Chat Messages Viewport -->
+    <div class="chat-messages" #chatScrollContainer (click)="onChatAreaClick($event)">
+      <div *ngFor="let msg of messages" class="message-row" [class.user]="msg.sender === 'user'" [class.bot]="msg.sender === 'bot'">
+        <div class="message-bubble" [innerHTML]="msg.text"></div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div *ngIf="isTyping" class="message-row bot">
+        <div class="message-bubble">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestion Action Chips -->
+    <div class="suggestion-area">
+      <div class="suggestion-title">Portfolio Actions</div>
+      <div class="chips-wrapper">
+        <button
+          *ngFor="let chip of suggestionChips"
+          class="chip"
+          (click)="onChipClick(chip)">
+          {{ chip }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer Input Form -->
+    <div class="drawer-footer">
+      <form class="input-form" (submit)="sendMessage($event)">
+        <input
+          type="text"
+          name="userQuery"
+          [(ngModel)]="userQuery"
+          placeholder="Ask about your wallet or a stock (e.g. NVDA)..."
+          autocomplete="off"
+          [disabled]="isTyping">
+        <button type="submit" class="send-btn" [disabled]="isTyping || !userQuery.trim()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

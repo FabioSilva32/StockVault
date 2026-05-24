@@ -1,0 +1,46 @@
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Stock Wallet</h2>
+  <div class="table-responsive shadow rounded">
+    <table class="table table-bordered table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Ticker</th>
+          <th>Empresa</th>
+          <th>Data da Compra</th>
+          <th>QT</th>
+          <th>PU</th>
+          <th class="table-primary text-primary">Total</th>
+          <th>Cotação do dia</th>
+          <th class="table-success text-success">Valor</th>
+          <th class="table-success text-success">Variação (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of portfolio">
+          <td><strong>{{ item.ticker }}</strong></td>
+          <td>{{ item.company }}</td>
+          <td>{{ item.purchaseDate }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.purchasePrice | number:'1.2-2' }}</td>
+          <td class="table-primary">{{ item.totalPurchaseValue | number:'1.2-2' }}</td>
+          <td>{{ item.currentQuote | number:'1.2-2' }}</td>
+          <td class="table-success">{{ item.currentValue | number:'1.2-2' }}</td>
+          <td class="table-success fw-bold" [ngClass]="getVariationColor(item.variationPercentage)">
+            <span *ngIf="item.variationPercentage > 0">+</span>{{ item.variationPercentage | number:'1.2-2' }}%
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="fw-bold">
+          <td colspan="5" class="text-end table-warning">TOTAL</td>
+          <td class="table-primary">{{ totalAcquisitionValue | number:'1.2-2' }}</td>
+          <td class="table-warning"></td>
+          <td class="table-success">{{ totalCurrentValue | number:'1.2-2' }}</td>
+          <td class="table-success" [ngClass]="getVariationColor(overallVariation)">
+             <span *ngIf="overallVariation > 0">+</span>{{ overallVariation | number:'1.2-2' }}%
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

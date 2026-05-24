@@ -1,0 +1,391 @@
+<div class="page-enter">
+  <div class="container">
+
+    <!-- Back link -->
+    <div class="back-link">
+      <a routerLink="/market" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Market
+      </a>
+    </div>
+
+    <!-- Stock header -->
+    <div class="stock-header">
+      <div class="stock-title-row">
+        <div class="stock-title-left">
+          <div class="stock-logo">
+            <div class="logo-wrapper">
+              <img *ngIf="getLogoUrl(ticker)" [src]="getLogoUrl(ticker)" class="company-logo-img" (error)="reportBrokenLogo(ticker)" [alt]="ticker">
+              <span *ngIf="!getLogoUrl(ticker)">{{ ticker.slice(0,2) }}</span>
+            </div>
+          </div>
+          <div class="stock-title-info">
+            <h1>{{ companyName }}</h1>
+            <span class="stock-ticker">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/></svg>
+              {{ ticker }}
+              <span *ngIf="profile?.exchange" style="opacity:0.5">· {{ profile?.exchange }}</span>
+            </span>
+          </div>
+        </div>
+        <div class="stock-header-actions">
+          <button class="watchlist-btn" [class.in-watchlist]="watchlist" (click)="toggleWatchlist()">
+            <svg width="14" height="14" viewBox="0 0 24 24" [attr.fill]="watchlist ? '#f59e0b' : 'none'" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {{ watchlist ? 'Watchlisted' : 'Add to Watchlist' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Price section -->
+      <div class="stock-price-section">
+        <h2 class="current-price">${{ currentPrice | number:'1.2-2' }}</h2>
+        <div class="price-change" [class.positive]="priceChange >= 0" [class.negative]="priceChange < 0">
+          {{ priceChange >= 0 ? '+' : '' }}${{ priceChange | number:'1.2-2' }}
+          &nbsp;({{ percentChange >= 0 ? '+' : '' }}{{ percentChange | number:'1.2-2' }}%)
+          <span class="timeframe-label">today</span>
+        </div>
+        <div class="quote-summary">
+          <span>Open <strong>${{ quoteData?.o | number:'1.2-2' }}</strong></span>
+          <span>High <strong>${{ quoteData?.h | number:'1.2-2' }}</strong></span>
+          <span>Low <strong>${{ quoteData?.l | number:'1.2-2' }}</strong></span>
+          <span>Prev Close <strong>${{ quoteData?.pc | number:'1.2-2' }}</strong></span>
+          <span *ngIf="quoteData?.v">Volume <strong>{{ (quoteData!.v! / 1e6 | number:'1.2-2') }}M</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart section -->
+    <div class="chart-section glass">
+      <div class="chart-toolbar">
+        <div class="chart-title">Price Chart</div>
+        <div class="chart-actions">
+          <!-- Indicators toggles -->
+          <div class="indicator-group" style="display: inline-flex; gap: 6px; margin-right: 12px; padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.08); align-items: center;">
+            <button class="chart-mode-btn indicator-btn" [class.active]="showEma20" (click)="toggleEma20()">
+              EMA 20
+            </button>
+            <button class="chart-mode-btn indicator-btn" [class.active]="showEma50" (click)="toggleEma50()">
+              EMA 50
+            </button>
+            <button class="chart-mode-btn indicator-btn" [class.active]="showRsi" (click)="toggleRsi()">
+              RSI 14
+            </button>
+          </div>
+          
+          <button class="chart-mode-btn" [class.active]="chartType==='area'" (click)="toggleChartType('area')">
+            Line / Area
+          </button>
+          <button class="chart-mode-btn" [class.active]="chartType==='candlestick'" (click)="toggleChartType('candlestick')">
+            Candlesticks
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="chartLoading" class="chart-loading">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        Loading chart…
+      </div>
+
+      <div class="chart-container" #chartContainer [style.display]="chartLoading ? 'none' : 'block'"></div>
+
+      <!-- RSI Container pane -->
+      <div class="rsi-chart-pane" [style.display]="showRsi && !chartLoading ? 'block' : 'none'" style="margin-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 12px;">
+        <div style="font-size: 11px; font-weight: 700; color: #c084fc; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px;">
+          <span>💜 RSI (14) Oscillator</span>
+        </div>
+        <div class="rsi-container-wrapper" style="width: 100%; min-height: 120px;" #rsiContainer></div>
+      </div>
+
+      <div class="timeframe-selector">
+        <button
+          *ngFor="let tf of timeframes"
+          class="tf-btn"
+          [class.active]="tf === selectedTimeframe"
+          (click)="selectTimeframe(tf)">
+          {{ tf }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Content grid: stats + trade -->
+    <div class="content-grid">
+
+      <!-- Key stats -->
+      <div class="stats-section glass">
+        <h3 class="section-heading">Key Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Market Cap</span>
+            <span class="stat-value">{{ stats.marketCap }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Sector</span>
+            <span class="stat-value">{{ stats.sector }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">P/E Ratio</span>
+            <span class="stat-value">{{ stats.peRatio }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Dividend Yield</span>
+            <span class="stat-value">{{ stats.dividendYield }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">52W High</span>
+            <span class="stat-value text-positive">{{ stats.high52 }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">52W Low</span>
+            <span class="stat-value text-negative">{{ stats.low52 }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Volume</span>
+            <span class="stat-value">{{ stats.volume }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Exchange</span>
+            <span class="stat-value">{{ stats.exchange }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trade panel -->
+      <div class="action-section glass">
+        <div class="trade-panel-header">
+          <h3 class="section-heading" style="margin-bottom:0;padding-bottom:0;border-bottom:none">Trade {{ ticker }}</h3>
+          <div class="trade-toggle">
+            <button class="btn-switch buy" [class.active]="orderMode==='buy'" (click)="setOrderMode('buy')">Buy</button>
+            <button class="btn-switch sell" [class.active]="orderMode==='sell'" (click)="setOrderMode('sell')">Sell</button>
+          </div>
+        </div>
+
+        <!-- Order Type Segmented Control -->
+        <div style="margin-top: 12px; margin-bottom: 12px;">
+          <div class="pill-segmented-control">
+            <button class="segment-btn" [class.active]="orderType==='market'" (click)="setOrderType('market')">Market</button>
+            <button class="segment-btn" [class.active]="orderType==='limit'" (click)="setOrderType('limit')">Limit</button>
+            <button class="segment-btn" [class.active]="orderType==='stop-loss'" (click)="setOrderType('stop-loss')">Stop Loss</button>
+            <button class="segment-btn" [class.active]="orderType==='take-profit'" (click)="setOrderType('take-profit')">Take Profit</button>
+          </div>
+        </div>
+
+        <hr style="border-color:rgba(255,255,255,0.05);margin:12px 0">
+
+        <div class="trade-grid">
+          <div class="trade-row">
+            <span>Market Price</span>
+            <strong class="mono-num">${{ currentPrice | number:'1.2-2' }}</strong>
+          </div>
+          
+          <!-- Trigger Price Input (For Limit / Stop-Loss / Take-Profit) -->
+          <div class="trade-row" *ngIf="orderType !== 'market'">
+            <span>
+              {{ orderType === 'limit' ? 'Limit Trigger Price' : orderType === 'stop-loss' ? 'Stop Trigger Price' : 'Take Profit Trigger Price' }}
+            </span>
+            <input type="number" [(ngModel)]="customPrice" [placeholder]="currentPrice" min="0.01" step="0.01" style="width:130px; text-align: right;" />
+          </div>
+
+          <div class="trade-row" style="font-size: 13px; color: #94a3b8; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 10px;">
+            <span>Available Buying Power</span>
+            <strong class="mono-num" style="color: #f1f5f9;">${{ cashBalance | number:'1.2-2' }}</strong>
+          </div>
+          <div class="quantity-row">
+            <div class="quantity-label">
+              <span style="color:#94a3b8;font-size:13px">Quantity</span>
+              <strong style="color:#f1f5f9;font-size:16px;font-weight:700">{{ orderQuantity }} shares</strong>
+            </div>
+            <input type="range" min="1" max="100" [(ngModel)]="orderQuantity" />
+          </div>
+          <div class="trade-total-row">
+            <span style="color:#94a3b8;font-size:13px">Estimated {{ orderMode === 'buy' ? 'Cost' : 'Proceeds' }}</span>
+            <span class="trade-total-amt" [class.text-positive]="orderMode==='sell'" [class.text-accent]="orderMode==='buy'">
+              ${{ (orderQuantity * orderPrice) | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="trade-actions">
+          <button class="btn" [class.buy-btn]="orderMode==='buy'" [class.sell-btn]="orderMode==='sell'"
+                  (click)="submitOrder()" [disabled]="tradeLoading || (orderMode === 'buy' && (orderQuantity * orderPrice) > cashBalance)">
+            {{ tradeLoading ? 'Processing…' : 
+               (orderType !== 'market' ? 
+                 ('Set ' + (orderType === 'limit' ? 'Limit' : orderType === 'stop-loss' ? 'Stop' : 'Take Profit') + ' ' + (orderMode === 'buy' ? 'Buy' : 'Sell')) : 
+                 (orderMode === 'buy' ? '↑ Buy ' + orderQuantity + ' Share' + (orderQuantity !== 1 ? 's' : '') : '↓ Sell ' + orderQuantity + ' Share' + (orderQuantity !== 1 ? 's' : ''))
+               )
+            }}
+          </button>
+        </div>
+
+        <div class="trade-feedback">
+          <div class="error-message" *ngIf="tradeError">❌ {{ tradeError }}</div>
+          <div class="success-message" *ngIf="tradeSuccess">✅ {{ tradeSuccess }}</div>
+        </div>
+      </div>
+
+      <!-- Price Alerts panel -->
+      <div class="alerts-section glass" style="margin-top: 20px; padding: 24px; border-radius: 18px;">
+        <h3 class="section-heading" style="margin-bottom:8px;padding-bottom:0;border-bottom:none">Price Alerts 🔔</h3>
+        <p style="color:#64748b;font-size:12.5px;margin-bottom:18px;line-height:1.45">Get real-time browser alerts when ticker hits your threshold.</p>
+        
+        <!-- Interactive Reference Price Mode Selection -->
+        <div class="alert-ref-selector" style="margin-bottom: 20px;">
+          <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+            Target Reference Price
+          </div>
+          <div class="pill-segmented-control" style="display: flex; background: rgba(0,0,0,0.2); padding: 3px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+            <button 
+              [class.active]="alertReferenceMode === 'market'" 
+              (click)="alertReferenceMode = 'market'"
+              style="flex: 1; border: none; background: transparent; padding: 8px 12px; font-size: 12px; font-weight: 600; color: #94a3b8; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              class="segment-btn">
+              📈 Market Price (${{ currentPrice | number:'1.2-2' }})
+            </button>
+            <button 
+              [class.active]="alertReferenceMode === 'average'" 
+              [disabled]="!hasHolding"
+              (click)="alertReferenceMode = 'average'"
+              style="flex: 1; border: none; background: transparent; padding: 8px 12px; font-size: 12px; font-weight: 600; color: #94a3b8; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              [style.opacity]="hasHolding ? 1 : 0.4"
+              [style.cursor]="hasHolding ? 'pointer' : 'not-allowed'"
+              class="segment-btn"
+              [title]="hasHolding ? 'Presets relative to your purchase price' : 'No position owned in this stock'">
+              💼 Buy Price ({{ hasHolding ? '$' + (avgPurchasePrice | number:'1.2-2') : 'Locked' }})
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Presets Grid -->
+        <div class="alert-presets" style="margin-bottom: 20px;">
+          <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+            ⚡ Quick Target Price Presets
+          </div>
+          
+          <!-- Upside presets -->
+          <div class="preset-row-label" style="font-size: 10px; font-weight: 600; color: #00d395; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+            <span>▲ Upside Target</span>
+          </div>
+          <div class="preset-group" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px;">
+            <button class="preset-btn up" (click)="addPresetAlert('up', 1)">
+              <span class="pct">+1%</span>
+              <span class="prc">{{ formatPresetPrice('up', 1) }}</span>
+            </button>
+            <button class="preset-btn up" (click)="addPresetAlert('up', 2)">
+              <span class="pct">+2%</span>
+              <span class="prc">{{ formatPresetPrice('up', 2) }}</span>
+            </button>
+            <button class="preset-btn up" (click)="addPresetAlert('up', 5)">
+              <span class="pct">+5%</span>
+              <span class="prc">{{ formatPresetPrice('up', 5) }}</span>
+            </button>
+            <button class="preset-btn up" (click)="addPresetAlert('up', 10)">
+              <span class="pct">+10%</span>
+              <span class="prc">{{ formatPresetPrice('up', 10) }}</span>
+            </button>
+            <button class="preset-btn up" (click)="addPresetAlert('up', 15)">
+              <span class="pct">+15%</span>
+              <span class="prc">{{ formatPresetPrice('up', 15) }}</span>
+            </button>
+          </div>
+          
+          <!-- Downside presets -->
+          <div class="preset-row-label" style="font-size: 10px; font-weight: 600; color: #ff4560; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+            <span>▼ Downside Target</span>
+          </div>
+          <div class="preset-group" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+            <button class="preset-btn down" (click)="addPresetAlert('down', 1)">
+              <span class="pct">-1%</span>
+              <span class="prc">{{ formatPresetPrice('down', 1) }}</span>
+            </button>
+            <button class="preset-btn down" (click)="addPresetAlert('down', 2)">
+              <span class="pct">-2%</span>
+              <span class="prc">{{ formatPresetPrice('down', 2) }}</span>
+            </button>
+            <button class="preset-btn down" (click)="addPresetAlert('down', 5)">
+              <span class="pct">-5%</span>
+              <span class="prc">{{ formatPresetPrice('down', 5) }}</span>
+            </button>
+            <button class="preset-btn down" (click)="addPresetAlert('down', 10)">
+              <span class="pct">-10%</span>
+              <span class="prc">{{ formatPresetPrice('down', 10) }}</span>
+            </button>
+            <button class="preset-btn down" (click)="addPresetAlert('down', 15)">
+              <span class="pct">-15%</span>
+              <span class="prc">{{ formatPresetPrice('down', 15) }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+          Or set custom alert
+        </div>
+        
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <select [(ngModel)]="alertCondition" style="flex:1.2;background:rgba(255,255,255,0.03);color:#f1f5f9;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;font-size:13px;outline:none;cursor:pointer">
+            <option value="above">Goes Above (≥)</option>
+            <option value="below">Goes Below (≤)</option>
+          </select>
+          <input type="number" [(ngModel)]="alertPrice" placeholder="Price" style="width:100px;background:rgba(255,255,255,0.03);color:#f1f5f9;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;font-size:13px;outline:none" />
+          <button class="btn btn-primary" (click)="addAlert()" style="padding: 10px 16px; font-size:13px; font-weight:700; border-radius:10px; justify-content:center">Set</button>
+        </div>
+
+        <!-- Feedback Messages -->
+        <div class="alert-feedback" style="margin-bottom: 12px; font-size: 12px; font-weight: 600;">
+          <div class="alert-success-msg" *ngIf="alertSuccess" style="color: #00d395; background: rgba(0, 211, 149, 0.08); border: 1px solid rgba(0, 211, 149, 0.15); padding: 8px 12px; border-radius: 8px;">
+            ✅ {{ alertSuccess }}
+          </div>
+          <div class="alert-error-msg" *ngIf="alertError" style="color: #ff4560; background: rgba(255, 69, 96, 0.08); border: 1px solid rgba(255, 69, 96, 0.15); padding: 8px 12px; border-radius: 8px;">
+            ❌ {{ alertError }}
+          </div>
+        </div>
+
+        <div class="alerts-list">
+          <div *ngIf="activeAlerts.length === 0" style="color:#475569;font-size:12px;text-align:center;padding:12px;background:rgba(255,255,255,0.01);border-radius:8px;border:1px dashed rgba(255,255,255,0.03)">
+            No active target alerts set.
+          </div>
+          <div class="alert-item" *ngFor="let alert of activeAlerts; let i = index" [style.opacity]="alert.triggered ? 0.6 : 1" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);margin-bottom:8px;font-size:13px">
+            <span style="color:#f1f5f9;font-weight:600">
+              {{ alert.condition === 'above' ? '📈 ≥' : '📉 ≤' }} ${{ alert.price | number:'1.2-2' }}
+            </span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span *ngIf="alert.triggered" style="color:#00d395;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">
+                🔔 Triggered
+              </span>
+              <span *ngIf="!alert.triggered" style="color:#64748b;font-size:11px">
+                Pending
+              </span>
+              <button (click)="removeAlert(i); $event.stopPropagation()" style="background:transparent;border:none;color:#ff4560;cursor:pointer;font-size:14px;padding:0 4px;font-weight:700;line-height:1">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News -->
+    <div class="news-section glass">
+      <div class="section-heading">Related News</div>
+      <div class="news-grid" *ngIf="news.length > 0; else noNews">
+        <div class="news-card" *ngFor="let item of news">
+          <a [href]="item.url" target="_blank" rel="noreferrer">
+            <div class="news-source-badge">
+              📰 {{ item.source }}
+            </div>
+            <div class="news-title">{{ item.headline }}</div>
+            <div class="news-meta">
+              <span>{{ item.category }}</span>
+              <span>{{ item.datetime * 1000 | date:'MMM d, y' }}</span>
+            </div>
+            <p class="news-summary">{{ item.summary }}</p>
+            <div class="news-read-more">Read more →</div>
+          </a>
+        </div>
+      </div>
+      <ng-template #noNews>
+        <div class="empty-state" style="padding:40px">
+          <div class="empty-state-icon" style="font-size:36px">📰</div>
+          <div class="empty-state-title">No recent news available</div>
+        </div>
+      </ng-template>
+    </div>
+
+  </div>
+</div>
