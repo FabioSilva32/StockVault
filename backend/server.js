@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
-const MONGO_URI = 'mongodb+srv://a35713_db_user:Macaco69@cluster0.brcvrcz.mongodb.net/stockwallet?appName=Cluster0';
+const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://a35713_db_user:Macaco69@cluster0.brcvrcz.mongodb.net/stockwallet?appName=Cluster0';
 
 // Middleware
 app.use(cors());
@@ -20,10 +20,29 @@ app.use('/api/stocks', require('./routes/stocks'));
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 // Connect to MongoDB and start server
-mongoose.connect(MONGO_URI)
-  .then(async () => {
-    console.log('✅ Connected to MongoDB');
+async function startServer() {
+  let connected = false;
+  try {
+    console.log('🔄 Attempting to connect to MongoDB Atlas...');
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 4000 });
+    console.log('✅ Connected to MongoDB Atlas');
+    connected = true;
+  } catch (err) {
+    console.warn('⚠️ Atlas connection failed (cluster may be paused or unreachable):', err.message);
+    try {
+      console.log('🔄 Starting local in-memory MongoDB instance as fallback...');
+      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const mongod = await MongoMemoryServer.create();
+      const localUri = mongod.getUri();
+      await mongoose.connect(localUri);
+      console.log('✅ Connected to local in-memory MongoDB');
+      connected = true;
+    } catch (memErr) {
+      console.error('❌ Failed to start in-memory MongoDB fallback:', memErr.message);
+    }
+  }
 
+  if (connected) {
     // Seed initial portfolio if empty
     const Holding = require('./models/Holding');
     const Transaction = require('./models/Transaction');
@@ -42,8 +61,10 @@ mongoose.connect(MONGO_URI)
     }
 
     app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err.message);
+  } else {
+    console.error('❌ Could not start backend server without a database.');
     process.exit(1);
-  });
+  }
+}
+
+startServer();
