@@ -16,6 +16,9 @@ app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/stocks', require('./routes/stocks'));
 
+// Welcome route
+app.get('/', (req, res) => res.json({ message: 'StockVault API is live and healthy! 🚀', status: 'ok', endpoints: ['/api/health', '/api/portfolio', '/api/transactions', '/api/stats', '/api/stocks/candles'] }));
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
