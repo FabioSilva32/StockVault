@@ -642,8 +642,8 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getSparklineColor(ticker: string): string {
     const prices = this.sparklineData.get(ticker);
-    if (!prices || prices.length < 2) return '#6c63ff';
-    return prices[prices.length - 1] >= prices[0] ? '#00d395' : '#ff4560';
+    if (!prices || prices.length < 2) return '#0ea5e9';
+    return prices[prices.length - 1] >= prices[0] ? '#10b981' : '#f43f5e';
   }
 
   private loadSparklines(): void {
@@ -693,7 +693,7 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
     ctx.fillText('StockVault', 40, 50);
     
     // Draw a small icon next to it
-    ctx.fillStyle = '#6c63ff';
+    ctx.fillStyle = '#0ea5e9';
     ctx.beginPath();
     ctx.arc(30, 42, 6, 0, Math.PI * 2);
     ctx.fill();
@@ -773,7 +773,7 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
       topHoldings.forEach((h, idx) => {
         const yPos = 305 + idx * 25;
         // Dot indicator
-        ctx.fillStyle = '#6c63ff';
+        ctx.fillStyle = '#0ea5e9';
         ctx.beginPath();
         ctx.arc(45, yPos - 4, 3, 0, Math.PI * 2);
         ctx.fill();
@@ -823,42 +823,59 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resizeObserver?.disconnect();
     this.chart?.remove();
 
+    const initialWidth = this.chartContainer.nativeElement.clientWidth || 800;
     this.chart = createChart(this.chartContainer.nativeElement, {
-      width: this.chartContainer.nativeElement.clientWidth,
+      width: initialWidth,
       height: 380,
       layout: {
         background: { color: 'transparent' },
         textColor: '#64748b'
       },
       grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.04)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.04)' }
+        vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.03)' }
       },
       rightPriceScale: { borderVisible: false },
       timeScale: {
         borderVisible: false,
-        rightOffset: 2,
+        lockVisibleTimeRangeOnResize: true,
+        rightOffset: 3,
+        fixLeftEdge: true,
         fixRightEdge: true
+      },
+      handleScroll: {
+        mouseWheel: false, // Prevents page scrolling with wheel from distorting the chart
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: false
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: false,
+        pinch: true
       },
       crosshair: {
         mode: 1,
-        vertLine: { color: 'rgba(108,99,255,0.4)', width: 1, style: 3 },
-        horzLine: { color: 'rgba(108,99,255,0.4)', width: 1, style: 3 }
+        vertLine: { color: 'rgba(14,165,233,0.3)', width: 1, style: 3 },
+        horzLine: { color: 'rgba(14,165,233,0.3)', width: 1, style: 3 }
       }
     });
 
     this.lineSeries = this.chart.addSeries(AreaSeries, {
-      lineColor: '#00d395',
-      topColor: 'rgba(0, 211, 149, 0.28)',
-      bottomColor: 'rgba(0, 211, 149, 0.04)',
+      lineColor: '#10b981',
+      topColor: 'rgba(16, 185, 129, 0.22)',
+      bottomColor: 'rgba(16, 185, 129, 0.02)',
       lineWidth: 2
     });
 
     // Resize observer
     this.resizeObserver = new ResizeObserver(entries => {
       if (!entries.length || entries[0].target !== this.chartContainer.nativeElement) return;
-      const { width, height } = entries[0].contentRect;
-      this.chart?.applyOptions({ width, height });
+      const width = entries[0].contentRect.width;
+      if (width > 0 && this.chart) {
+        this.chart.applyOptions({ width });
+        this.chart.timeScale().fitContent();
+      }
     });
     this.resizeObserver.observe(this.chartContainer.nativeElement);
   }

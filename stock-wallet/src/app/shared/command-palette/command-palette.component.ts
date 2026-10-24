@@ -136,7 +136,7 @@ const PAGES: PaletteResult[] = [];
       padding: 18px 20px;
       border-bottom: 1px solid rgba(255,255,255,0.07);
     }
-    .palette-search-icon { color: #6c63ff; flex-shrink: 0; }
+    .palette-search-icon { color: #0ea5e9; flex-shrink: 0; }
     .palette-input {
       flex: 1;
       background: none;
@@ -198,15 +198,15 @@ const PAGES: PaletteResult[] = [];
     .ticker-icon-chip {
       font-size: 11px;
       font-weight: 800;
-      color: #a5b4fc;
+      color: #38bdf8;
       letter-spacing: -0.03em;
-      background: rgba(108,99,255,0.12);
-      border: 1px solid rgba(108,99,255,0.2);
+      background: rgba(14,165,233,0.1);
+      border: 1px solid rgba(14,165,233,0.2);
     }
     .palette-item-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .palette-item-label { font-size: 13.5px; font-weight: 600; color: #f1f5f9; }
     .palette-item-sublabel { font-size: 11.5px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .palette-item-badge { font-size: 11px; color: #6c63ff; font-weight: 700; flex-shrink: 0; }
+    .palette-item-badge { font-size: 11px; color: #0ea5e9; font-weight: 700; flex-shrink: 0; }
     .palette-hint { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 2px 6px; font-size: 11px; color: #64748b; font-family: inherit; flex-shrink: 0; }
     .palette-loading {
       display: flex;
@@ -218,8 +218,8 @@ const PAGES: PaletteResult[] = [];
     }
     .palette-spinner {
       width: 16px; height: 16px;
-      border: 2px solid rgba(108,99,255,0.2);
-      border-top-color: #6c63ff;
+      border: 2px solid rgba(14,165,233,0.2);
+      border-top-color: #0ea5e9;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }

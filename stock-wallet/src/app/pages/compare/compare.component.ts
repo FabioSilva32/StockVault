@@ -65,7 +65,7 @@ export class CompareComponent implements OnInit, AfterViewInit, OnDestroy {
   showSuggestions = false;
   
   // Custom Line colors for multi-stock comparisons
-  COLORS = ['#6c63ff', '#00d395', '#f59e0b']; // Indigo, Emerald, Amber
+  COLORS = ['#0ea5e9', '#10b981', '#f59e0b']; // Cyan, Emerald, Amber
   
   // Real-time quote stream subscriptions
   private priceSubs: Map<string, Subscription> = new Map();
@@ -118,8 +118,11 @@ export class CompareComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.resizeObserver = new ResizeObserver(entries => {
       if (!entries.length || entries[0].target !== this.chartContainer.nativeElement) return;
-      const { width, height } = entries[0].contentRect;
-      this.chart.applyOptions({ width, height });
+      const width = entries[0].contentRect.width;
+      if (width > 0 && this.chart) {
+        this.chart.applyOptions({ width });
+        this.chart.timeScale().fitContent();
+      }
     });
     this.resizeObserver.observe(this.chartContainer.nativeElement);
   }
@@ -133,17 +136,18 @@ export class CompareComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initChart(): void {
+    const initialWidth = this.chartContainer.nativeElement.clientWidth || 800;
     this.chart = createChart(this.chartContainer.nativeElement, {
-      width: this.chartContainer.nativeElement.clientWidth,
+      width: initialWidth,
       height: 380,
       layout: {
         background: { color: 'transparent' },
-        textColor: '#A3A6AF',
+        textColor: '#94a3b8',
         fontFamily: 'Inter, sans-serif'
       },
       grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.04)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.04)' }
+        vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.03)' }
       },
       rightPriceScale: { 
         borderVisible: false
@@ -153,9 +157,21 @@ export class CompareComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       timeScale: {
         borderVisible: false,
-        lockVisibleTimeRangeOnResize: false,
+        lockVisibleTimeRangeOnResize: true,
         rightOffset: 5,
+        fixLeftEdge: true,
         fixRightEdge: true
+      },
+      handleScroll: {
+        mouseWheel: false,
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: false
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: false,
+        pinch: true
       },
       crosshair: {
         mode: 1

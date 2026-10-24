@@ -81,12 +81,13 @@
         </div>
       </div>
 
-      <div *ngIf="chartLoading" class="chart-loading">
-        <div class="loading-dots"><span></span><span></span><span></span></div>
-        Loading chart…
+      <div class="chart-wrapper">
+        <div *ngIf="chartLoading" class="chart-loading">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+          Loading chart…
+        </div>
+        <div class="chart-container" #chartContainer></div>
       </div>
-
-      <div class="chart-container" #chartContainer [style.display]="chartLoading ? 'none' : 'block'"></div>
 
       <!-- RSI Container pane -->
       <div class="rsi-chart-pane" [style.display]="showRsi && !chartLoading ? 'block' : 'none'" style="margin-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 12px;">

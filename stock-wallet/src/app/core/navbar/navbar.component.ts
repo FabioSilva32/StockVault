@@ -14,8 +14,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
         <a routerLink="/portfolio" class="navbar-brand" (click)="mobileMenuOpen = false">
           <div class="brand-logo">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 17L8 12L12 16L17 9L21 13" stroke="#a5b4fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="21" cy="13" r="2" fill="#6c63ff"/>
+              <path d="M3 17L8 12L12 16L17 9L21 13" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="21" cy="13" r="2" fill="#0ea5e9"/>
             </svg>
           </div>
           <span class="brand-name">Stock<span class="brand-accent">Vault</span></span>
@@ -146,7 +146,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       letter-spacing: -0.03em;
     }
     .brand-accent {
-      background: linear-gradient(135deg, #a5b4fc, #6c63ff);
+      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -175,8 +175,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       background: rgba(255,255,255,0.04);
     }
     .nav-link.active {
-      color: #a5b4fc;
-      background: rgba(108,99,255,0.12);
+      color: #38bdf8;
+      background: rgba(14,165,233,0.12);
       font-weight: 600;
     }
     .nav-icon { flex-shrink: 0; }
@@ -331,8 +331,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       transition: all 0.15s ease;
     }
     .mobile-nav-link:hover, .mobile-nav-link.active {
-      background: rgba(108,99,255,0.08);
-      color: #a5b4fc;
+      background: rgba(14,165,233,0.08);
+      color: #38bdf8;
     }
 
     @media (max-width: 900px) {

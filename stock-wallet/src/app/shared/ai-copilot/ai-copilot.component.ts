@@ -480,10 +480,10 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
                 <span style="font-size: 11px; background: rgba(0, 211, 149, 0.15); padding: 2px 6px; border-radius: 4px;">GROWTH BUST</span>
               </button>
 
-              <button class="chip" style="width: 100%; text-align: left; padding: 10px 14px; background: rgba(108, 99, 255, 0.08); border: 1px solid rgba(108, 99, 255, 0.25); color: #a5b4fc; display: flex; align-items: center; gap: 10px; border-radius: 12px; font-weight: 700; transition: all 0.2s;" data-stress-event="rate_cut">
+              <button class="chip" style="width: 100%; text-align: left; padding: 10px 14px; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); color: #38bdf8; display: flex; align-items: center; gap: 10px; border-radius: 12px; font-weight: 700; transition: all 0.2s;" data-stress-event="rate_cut">
                 <span>🌊</span>
                 <span style="flex: 1;">Dovish Fed Rate Cut (+10% Boost)</span>
-                <span style="font-size: 11px; background: rgba(108, 99, 255, 0.15); padding: 2px 6px; border-radius: 4px;">MACRO BOOST</span>
+                <span style="font-size: 11px; background: rgba(14, 165, 233, 0.15); padding: 2px 6px; border-radius: 4px;">MACRO BOOST</span>
               </button>
 
               <button class="chip" style="width: 100%; text-align: left; padding: 10px 14px; background: rgba(254, 176, 25, 0.08); border: 1px solid rgba(254, 176, 25, 0.25); color: #ffb019; display: flex; align-items: center; gap: 10px; border-radius: 12px; font-weight: 700; transition: all 0.2s;" data-stress-event="recession">
@@ -696,7 +696,7 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
               🛡️ <strong>AI Copilot Advice</strong>: ${advice}
             </div>
             
-            <h5 style="margin-top: 18px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #a5b4fc; font-weight: 700;">🤖 AI Suggested Action Plan</h5>
+            <h5 style="margin-top: 18px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #38bdf8; font-weight: 700;">🤖 AI Suggested Action Plan</h5>
             <p style="font-size: 11px; color: #64748b; margin-top: 2px;">Deploy these micro-reallocations in a single-click directly from this chat bubble:</p>
             
             ${actionCardsHtml}`;
@@ -738,7 +738,7 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
       auditSummary = `<span class="text-warning">⚠️</span> <strong>Diversification Concentration Risk</strong>: Your portfolio is heavily exposed to the <strong>${topSector.sector}</strong> sector which constitutes <strong>${topSector.pct.toFixed(1)}%</strong> of your holdings.`;
       recommendation = `🤖 <strong>AI Rebalancing Plan</strong>: To reduce volatility and hedge against sector-specific corrections, consider running our interactive rebalancing scanner to distribute capital across indices or defensive staples:
                         <div style="margin-top: 10px;">
-                          <button class="chip" style="width: 100%; background: #6c63ff; color: #fff; font-weight: 700; border: none; padding: 10px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" data-diagnostic="rebalance">
+                          <button class="chip" style="width: 100%; background: #0ea5e9; color: #fff; font-weight: 700; border: none; padding: 10px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" data-diagnostic="rebalance">
                             🔍 Run Rebalancing Diagnostic Scan
                           </button>
                         </div>`;
@@ -746,7 +746,7 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
       auditSummary = `<span class="text-positive">✅</span> <strong>Disciplined Asset Allocation</strong>: Your portfolio is beautifully diversified! Your largest sector is <strong>${topSector.sector}</strong>, representing only <strong>${topSector.pct.toFixed(1)}%</strong> of your holdings.`;
       recommendation = `🤖 <strong>AI Advice</strong>: Your allocation shows institutional-grade discipline. Keep maintaining this balance! You can run our interactive rebalancing scanner to optimize fractional allocations or deploy cash reserves:
                         <div style="margin-top: 10px;">
-                          <button class="chip" style="width: 100%; background: #6c63ff; color: #fff; font-weight: 700; border: none; padding: 10px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" data-diagnostic="rebalance">
+                          <button class="chip" style="width: 100%; background: #0ea5e9; color: #fff; font-weight: 700; border: none; padding: 10px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" data-diagnostic="rebalance">
                             🔍 Run Rebalancing Diagnostic Scan
                           </button>
                         </div>`;

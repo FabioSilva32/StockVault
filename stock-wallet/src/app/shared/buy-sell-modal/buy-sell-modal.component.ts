@@ -650,7 +650,7 @@ export class BuySellModalComponent implements OnInit {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const colors = [primaryColor, '#a5b4fc', '#f59e0b', '#38bdf8', '#ffffff', '#fb7185'];
+    const colors = [primaryColor, '#0ea5e9', '#f59e0b', '#38bdf8', '#ffffff', '#10b981'];
     const pieces: any[] = [];
     const count = 160;
 

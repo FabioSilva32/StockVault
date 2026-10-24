@@ -11,8 +11,37 @@
   left: -24px;
   right: -24px;
   height: 200px;
-  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(108,99,255,0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(14,165,233,0.06) 0%, transparent 70%);
   pointer-events: none;
+}
+
+.portfolio-chart-container-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+}
+
+.portfolio-chart-container-wrap .chart-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 14px;
+  background: rgba(9, 10, 15, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 4;
+  border-radius: 12px;
+}
+
+.portfolio-chart-canvas {
+  width: 100%;
+  min-height: 380px;
 }
 
 .summary-grid {
@@ -44,9 +73,9 @@
 }
 
 .summary-card:hover::before { opacity: 1; }
-.summary-card.positive::before { background: linear-gradient(90deg, #00d395, transparent); }
-.summary-card.negative::before { background: linear-gradient(90deg, #ff4560, transparent); }
-.summary-card.accent::before { background: linear-gradient(90deg, #6c63ff, transparent); }
+.summary-card.positive::before { background: linear-gradient(90deg, #10b981, transparent); }
+.summary-card.negative::before { background: linear-gradient(90deg, #f43f5e, transparent); }
+.summary-card.accent::before { background: linear-gradient(90deg, #0ea5e9, transparent); }
 .summary-card.gold::before { background: linear-gradient(90deg, #f59e0b, transparent); }
 
 .summary-card:hover {
@@ -329,7 +358,7 @@
 .loading-dots span {
   width: 8px;
   height: 8px;
-  background: #6c63ff;
+  background: #0ea5e9;
   border-radius: 50%;
   animation: dot-bounce 1.4s infinite ease-in-out both;
 }
@@ -367,9 +396,9 @@
 }
 
 .tf-btn.active {
-  color: #6c63ff;
-  background: rgba(108, 99, 255, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(108, 99, 255, 0.25);
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.25);
 }
 
 /* ===== Sliding Cash Drawer Overlay ===== */
@@ -781,7 +810,7 @@
 }
 .dividend-mini-table .ticker {
   font-weight: 700;
-  color: #a5b4fc;
+  color: #38bdf8;
 }
 
 /* ── Combined Perf & Responsive Table Tweaks ── */
@@ -923,7 +952,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c63ff, #4f46e5);
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -931,7 +960,7 @@
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(108,99,255,0.3);
+  box-shadow: 0 0 12px rgba(14,165,233,0.3);
 }
 .step-content { flex: 1; }
 .step-title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
@@ -943,7 +972,7 @@
   padding: 1px 5px;
   font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
-  color: #a5b4fc;
+  color: #7dd3fc;
 }
 .onboarding-actions {
   display: flex;

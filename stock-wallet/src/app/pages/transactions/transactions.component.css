@@ -76,9 +76,9 @@
 }
 .chip:hover { background: rgba(255,255,255,0.06); color: #f1f5f9; }
 .chip.active {
-  background: rgba(108,99,255,0.15);
-  color: #a5b4fc;
-  border-color: rgba(108,99,255,0.25);
+  background: rgba(14,165,233,0.12);
+  color: #38bdf8;
+  border-color: rgba(14,165,233,0.25);
 }
 .chip-buy.active {
   background: rgba(0,211,149,0.1);
@@ -143,7 +143,7 @@
   font-size: 11px;
   transition: color 0.15s ease;
 }
-.sort-icon.active { color: #a5b4fc; }
+.sort-icon.active { color: #38bdf8; }
 
 /* Date cell */
 .tx-date-cell {

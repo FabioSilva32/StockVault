@@ -82,14 +82,14 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(108,99,255,0.25), rgba(108,99,255,0.08));
-  border: 1px solid rgba(108,99,255,0.25);
+  background: linear-gradient(135deg, rgba(14,165,233,0.12), rgba(14,165,233,0.03));
+  border: 1px solid rgba(14,165,233,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   font-weight: 900;
-  color: #a5b4fc;
+  color: #38bdf8;
   flex-shrink: 0;
   letter-spacing: -0.02em;
 }
@@ -170,9 +170,9 @@
   letter-spacing: 0.06em;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(108,99,255,0.1);
-  color: #a5b4fc;
-  border: 1px solid rgba(108,99,255,0.15);
+  background: rgba(14,165,233,0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(14,165,233,0.18);
   margin-bottom: 10px;
 }
 
@@ -579,7 +579,7 @@
 .ticker-symbol {
   font-weight: 800;
   font-size: 13.5px;
-  color: #a5b4fc;
+  color: #38bdf8;
 }
 .ticker-price {
   font-weight: 700;

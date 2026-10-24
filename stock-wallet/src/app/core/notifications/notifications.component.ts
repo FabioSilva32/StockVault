@@ -47,7 +47,7 @@ export class NotificationsComponent implements OnInit {
 
   getAvatarStyle(ticker: string): { bg: string; color: string; abbreviation: string } {
     const symbol = ticker.toUpperCase();
-    let bg = 'linear-gradient(135deg, #6366F1, #4F46E5)'; // Default premium purple-indigo
+    let bg = 'linear-gradient(135deg, #0284c7, #0369a1)'; // Precision Cyan-Steel
     let color = '#ffffff';
     let abbreviation = symbol.slice(0, 2);
 

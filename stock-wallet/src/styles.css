@@ -12,46 +12,46 @@
 }
 
 :root {
-  /* Backgrounds */
-  --bg-primary:    #080c18;
-  --bg-secondary:  #0d1225;
-  --bg-tertiary:   #121830;
-  --bg-card:       rgba(255,255,255,0.035);
-  --bg-card-hover: rgba(255,255,255,0.065);
-  --bg-card-active: rgba(255,255,255,0.09);
+  /* Backgrounds - Refined Institutional Obsidian & Graphite */
+  --bg-primary:    #090a0f;
+  --bg-secondary:  #0f1117;
+  --bg-tertiary:   #161822;
+  --bg-card:       rgba(255,255,255,0.025);
+  --bg-card-hover: rgba(255,255,255,0.05);
+  --bg-card-active: rgba(255,255,255,0.08);
 
   /* Borders */
   --border:        rgba(255,255,255,0.07);
-  --border-strong: rgba(255,255,255,0.12);
-  --border-focus:  rgba(108,99,255,0.6);
+  --border-strong: rgba(255,255,255,0.13);
+  --border-focus:  rgba(14,165,233,0.5);
 
-  /* Accent */
-  --accent:        #6c63ff;
-  --accent-2:      #4f46e5;
-  --accent-light:  #a5b4fc;
-  --accent-glow:   rgba(108,99,255,0.2);
-  --accent-glow-strong: rgba(108,99,255,0.35);
+  /* Accent - Precision Financial Cyan & Ice-Steel */
+  --accent:        #0ea5e9;
+  --accent-2:      #0284c7;
+  --accent-light:  #7dd3fc;
+  --accent-glow:   rgba(14,165,233,0.12);
+  --accent-glow-strong: rgba(14,165,233,0.22);
 
-  /* Semantic */
-  --positive:      #00d395;
-  --positive-bg:   rgba(0,211,149,0.1);
-  --positive-glow: rgba(0,211,149,0.2);
-  --negative:      #ff4560;
-  --negative-bg:   rgba(255,69,96,0.1);
-  --negative-glow: rgba(255,69,96,0.2);
+  /* Semantic Financial */
+  --positive:      #10b981;
+  --positive-bg:   rgba(16,185,129,0.09);
+  --positive-glow: rgba(16,185,129,0.16);
+  --negative:      #f43f5e;
+  --negative-bg:   rgba(244,63,94,0.09);
+  --negative-glow: rgba(244,63,94,0.16);
   --warning:       #f59e0b;
-  --warning-bg:    rgba(245,158,11,0.1);
+  --warning-bg:    rgba(245,158,11,0.09);
   --neutral:       #94a3b8;
 
-  /* Text */
-  --text-primary:  #f1f5f9;
+  /* Typography */
+  --text-primary:  #f8fafc;
   --text-secondary:#94a3b8;
-  --text-muted:    #475569;
-  --text-faint:    #2d3a52;
+  --text-muted:    #64748b;
+  --text-faint:    #334155;
 
-  /* Special */
-  --buy-color:     #00d395;
-  --sell-color:    #ff4560;
+  /* Special Trading */
+  --buy-color:     #10b981;
+  --sell-color:    #f43f5e;
   --gold:          #f59e0b;
 
   /* Radius */
@@ -62,11 +62,11 @@
   --radius-xl:  24px;
   --radius-2xl: 32px;
 
-  /* Shadows */
-  --shadow-sm:   0 2px 8px rgba(0,0,0,0.3);
-  --shadow-card: 0 8px 32px rgba(0,0,0,0.4);
-  --shadow-xl:   0 24px 80px rgba(0,0,0,0.6);
-  --shadow-glow: 0 0 40px rgba(108,99,255,0.12);
+  /* Shadows - Crisp, non-blurry */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.3);
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-xl:   0 16px 48px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 24px rgba(14,165,233,0.08);
 
   /* Transitions */
   --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
@@ -75,33 +75,33 @@
 
 /* ─── Light Theme Override ─── */
 body.theme-light {
-  --bg-primary:    #f0f2f8;
-  --bg-secondary:  #e8eaf2;
-  --bg-tertiary:   #dde0ed;
-  --bg-card:       rgba(255,255,255,0.75);
-  --bg-card-hover: rgba(255,255,255,0.92);
+  --bg-primary:    #f8fafc;
+  --bg-secondary:  #f1f5f9;
+  --bg-tertiary:   #e2e8f0;
+  --bg-card:       rgba(255,255,255,0.85);
+  --bg-card-hover: rgba(255,255,255,0.96);
   --bg-card-active: rgba(255,255,255,1);
 
   --border:        rgba(0,0,0,0.08);
-  --border-strong: rgba(0,0,0,0.15);
-  --border-focus:  rgba(108,99,255,0.5);
+  --border-strong: rgba(0,0,0,0.14);
+  --border-focus:  rgba(14,165,233,0.5);
 
-  --text-primary:  #111827;
-  --text-secondary:#374151;
-  --text-muted:    #6B7280;
-  --text-faint:    #9CA3AF;
+  --text-primary:  #0f172a;
+  --text-secondary:#475569;
+  --text-muted:    #64748b;
+  --text-faint:    #94a3b8;
 
   --positive:      #059669;
   --positive-bg:   rgba(5,150,105,0.08);
-  --negative:      #DC2626;
-  --negative-bg:   rgba(220,38,38,0.08);
-  --nav-bg:        rgba(240,242,248,0.92);
+  --negative:      #e11d48;
+  --negative-bg:   rgba(225,29,72,0.08);
+  --nav-bg:        rgba(248,250,252,0.92);
 }
 
 body.theme-light::before {
   background:
-    radial-gradient(ellipse 80% 40% at 20% -10%, rgba(108,99,255,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 30% at 80% 100%, rgba(5,150,105,0.04) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 40% at 20% -10%, rgba(14,165,233,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 80% 100%, rgba(5,150,105,0.03) 0%, transparent 50%);
 }
 
 body.theme-light ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
@@ -128,14 +128,14 @@ html, body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* Animated gradient background on body */
+/* Subtle clean background accent on body */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 40% at 20% -10%, rgba(108,99,255,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 30% at 80% 100%, rgba(0,211,149,0.04) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 40% at 20% -10%, rgba(14,165,233,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 80% 100%, rgba(16,185,129,0.03) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
@@ -187,7 +187,7 @@ body::before {
 .pill-up    { background: var(--positive-bg); color: var(--positive); border: 1px solid rgba(0,211,149,0.15); }
 .pill-down  { background: var(--negative-bg); color: var(--negative); border: 1px solid rgba(255,69,96,0.15); }
 .pill-flat  { background: rgba(148,163,184,0.08); color: var(--neutral); border: 1px solid rgba(148,163,184,0.12); }
-.pill-accent { background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(108,99,255,0.2); }
+.pill-accent { background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(14,165,233,0.2); }
 
 /* Text utils */
 .text-positive  { color: var(--positive); }
@@ -231,10 +231,10 @@ body::before {
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
-  box-shadow: 0 4px 16px rgba(108,99,255,0.3);
+  box-shadow: 0 4px 16px rgba(14,165,233,0.25);
 }
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 24px rgba(108,99,255,0.45);
+  box-shadow: 0 6px 24px rgba(14,165,233,0.35);
   transform: translateY(-1px);
 }
 
@@ -353,7 +353,7 @@ body::before {
   padding: 16px 16px;
   font-weight: 700;
   border-top: 1px solid var(--border);
-  background: rgba(108,99,255,0.04);
+  background: rgba(255,255,255,0.02);
 }
 
 /* ===== Modal ===== */
@@ -370,13 +370,13 @@ body::before {
   animation: fadeIn 0.2s ease;
 }
 .modal-box {
-  background: #131929;
+  background: #10131a;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
   padding: 32px;
   width: 100%;
   max-width: 460px;
-  box-shadow: var(--shadow-xl), 0 0 60px rgba(108,99,255,0.1);
+  box-shadow: var(--shadow-xl), 0 0 32px rgba(0,0,0,0.5);
   animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
 .modal-header {
@@ -441,8 +441,8 @@ body::before {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent-glow), rgba(108,99,255,0.08));
-  border: 1px solid rgba(108,99,255,0.25);
+  background: linear-gradient(135deg, rgba(14,165,233,0.12), rgba(14,165,233,0.04));
+  border: 1px solid rgba(14,165,233,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -536,7 +536,7 @@ body::before {
   bottom: 28px;
   right: 28px;
   z-index: 2000;
-  background: #161d30;
+  background: #10131a;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: 14px 20px;
@@ -618,17 +618,17 @@ hr.sv-divider {
 }
 
 /* ===== Glow accents ===== */
-.glow-positive { box-shadow: 0 0 20px rgba(0,211,149,0.1); }
-.glow-negative { box-shadow: 0 0 20px rgba(255,69,96,0.1); }
-.glow-accent   { box-shadow: 0 0 20px rgba(108,99,255,0.15); }
+.glow-positive { box-shadow: 0 0 16px rgba(16,185,129,0.12); }
+.glow-negative { box-shadow: 0 0 16px rgba(244,63,94,0.12); }
+.glow-accent   { box-shadow: 0 0 16px rgba(14,165,233,0.12); }
 
 /* ===== Badge variants for tickers ===== */
 .ticker-icon-sm {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--accent-glow), rgba(108,99,255,0.06));
-  border: 1px solid rgba(108,99,255,0.2);
+  background: linear-gradient(135deg, rgba(14,165,233,0.12), rgba(14,165,233,0.03));
+  border: 1px solid rgba(14,165,233,0.18);
   display: flex;
   align-items: center;
   justify-content: center;

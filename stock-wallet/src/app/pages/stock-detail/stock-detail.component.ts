@@ -152,8 +152,15 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.resizeObserver = new ResizeObserver(entries => {
       if (!entries.length || entries[0].target !== this.chartContainer.nativeElement) { return; }
-      const { width, height } = entries[0].contentRect;
-      this.chart.applyOptions({ width, height });
+      const width = entries[0].contentRect.width;
+      if (width > 0 && this.chart) {
+        this.chart.applyOptions({ width });
+        this.chart.timeScale().fitContent();
+      }
+      if (width > 0 && this.rsiChart) {
+        this.rsiChart.applyOptions({ width });
+        this.rsiChart.timeScale().fitContent();
+      }
     });
     this.resizeObserver.observe(this.chartContainer.nativeElement);
   }
@@ -178,24 +185,44 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   initChart(): void {
+    const initialWidth = this.chartContainer.nativeElement.clientWidth || 800;
     this.chart = createChart(this.chartContainer.nativeElement, {
-      width: this.chartContainer.nativeElement.clientWidth,
+      width: initialWidth,
       height: 420,
       layout: {
         background: { color: 'transparent' },
-        textColor: '#A3A6AF'
+        textColor: '#94a3b8'
       },
       grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.05)' }
+        vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.03)' }
       },
-      rightPriceScale: { borderVisible: false },
+      rightPriceScale: {
+        borderVisible: false,
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1
+        }
+      },
       timeScale: {
         borderVisible: false,
-        lockVisibleTimeRangeOnResize: false,
-        rightOffset: 3,
-        fixRightEdge: false,
-        rightBarStaysOnScroll: true
+        lockVisibleTimeRangeOnResize: true,
+        rightOffset: 5,
+        fixLeftEdge: true,
+        fixRightEdge: true,
+        barSpacing: 8,
+        minBarSpacing: 3
+      },
+      handleScroll: {
+        mouseWheel: false, // Prevents page scrolling with mousewheel from flinging and distorting chart!
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: false
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: false, // Prevents mousewheel zoom while scrolling down page
+        pinch: true
       },
       crosshair: { mode: 1 }
     });
@@ -556,14 +583,13 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       // Render RSI sub-chart if toggled
       this.updateRsiChart();
 
-      // Fit chart content and show the latest bar on the right edge.
+      // Center and fit chart content perfectly
       setTimeout(() => {
         if (!this.chart) {
           return;
         }
         this.chart.timeScale().fitContent();
-        this.chart.timeScale().scrollToRealTime();
-      }, 100);
+      }, 50);
 
       this.updateChartColors();
     } catch (error) {
@@ -959,36 +985,51 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!this.rsiContainer || !this.rsiContainer.nativeElement) return;
 
       if (!this.rsiChart) {
+        const rsiWidth = this.rsiContainer.nativeElement.clientWidth || this.chartContainer.nativeElement.clientWidth || 800;
         this.rsiChart = createChart(this.rsiContainer.nativeElement, {
-          width: this.rsiContainer.nativeElement.clientWidth,
+          width: rsiWidth,
           height: 120,
           layout: {
             background: { color: 'transparent' },
-            textColor: '#A3A6AF'
+            textColor: '#94a3b8'
           },
           grid: {
-            vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
-            horzLines: { color: 'rgba(255, 255, 255, 0.05)' }
+            vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
+            horzLines: { color: 'rgba(255, 255, 255, 0.03)' }
           },
           rightPriceScale: { 
-            borderVisible: false
+            borderVisible: false,
+            scaleMargins: { top: 0.1, bottom: 0.1 }
           },
           timeScale: {
             borderVisible: false,
-            visible: false
+            visible: false,
+            fixLeftEdge: true,
+            fixRightEdge: true
+          },
+          handleScroll: {
+            mouseWheel: false,
+            pressedMouseMove: true,
+            horzTouchDrag: true,
+            vertTouchDrag: false
+          },
+          handleScale: {
+            axisPressedMouseMove: false,
+            mouseWheel: false,
+            pinch: false
           },
           crosshair: { mode: 1 }
         });
 
         this.rsiSeries = this.rsiChart.addSeries(LineSeries, {
-          color: '#c084fc',
+          color: '#38bdf8',
           lineWidth: 2,
           title: 'RSI 14'
         });
 
         this.rsiSeries.createPriceLine({
           price: 70,
-          color: 'rgba(255, 69, 96, 0.3)',
+          color: 'rgba(244, 63, 94, 0.4)',
           lineWidth: 1,
           lineStyle: 3,
           axisLabelVisible: true,
@@ -997,23 +1038,30 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.rsiSeries.createPriceLine({
           price: 30,
-          color: 'rgba(0, 211, 149, 0.3)',
+          color: 'rgba(16, 185, 129, 0.4)',
           lineWidth: 1,
           lineStyle: 3,
           axisLabelVisible: true,
           title: 'OS (30)'
         });
 
-        // Sync timescale logical range between main price chart and RSI
+        // Sync timescale logical range between main price chart and RSI without recursion
         const mainTimeScale = this.chart.timeScale();
         const rsiTimeScale = this.rsiChart.timeScale();
+        let isSyncing = false;
 
         mainTimeScale.subscribeVisibleLogicalRangeChange((range) => {
-          if (range) rsiTimeScale.setVisibleLogicalRange(range);
+          if (isSyncing || !range || !this.rsiChart) return;
+          isSyncing = true;
+          this.rsiChart.timeScale().setVisibleLogicalRange(range);
+          isSyncing = false;
         });
 
         rsiTimeScale.subscribeVisibleLogicalRangeChange((range) => {
-          if (range) mainTimeScale.setVisibleLogicalRange(range);
+          if (isSyncing || !range || !this.chart) return;
+          isSyncing = true;
+          this.chart.timeScale().setVisibleLogicalRange(range);
+          isSyncing = false;
         });
       }
 
