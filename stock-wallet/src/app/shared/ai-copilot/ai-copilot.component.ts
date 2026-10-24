@@ -8,6 +8,7 @@ import { CashService } from '../../core/services/cash.service';
 import { LivePriceService } from '../../core/services/live-price.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { Holding } from '../../core/models/models';
+import { AuthService } from '../../core/services/auth.service';
 
 interface ChatMessage {
   sender: 'user' | 'bot';
@@ -113,7 +114,8 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
     private livePrice: LivePriceService,
     private sanitizer: DomSanitizer,
     private notifications: NotificationService,
-    private injector: Injector
+    private injector: Injector,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -341,6 +343,14 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   executeQuickBuy(ticker: string, company: string, qty: number, price: number): void {
+    if (!this.authService.isLoggedIn()) {
+      this.pushBotMessage(`
+        <div style="color: #38bdf8; font-weight: bold; font-size: 13px;">🔒 Authentication Required</div>
+        <p style="font-size: 12px; margin-top: 4px;">You are currently browsing StockVault in <strong>Guest Mode</strong>. Please sign in or launch a free Demo account to execute trades via AI Copilot.</p>
+      `);
+      this.authService.openAuthModal('login', `Sign in to execute AI automated trade: Buy ${qty} ${ticker}.`);
+      return;
+    }
     const total = qty * price;
     const balance = this.cashService.getBalance();
     
@@ -402,6 +412,14 @@ export class AiCopilotComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   executeQuickSell(ticker: string, company: string, qty: number, price: number): void {
+    if (!this.authService.isLoggedIn()) {
+      this.pushBotMessage(`
+        <div style="color: #38bdf8; font-weight: bold; font-size: 13px;">🔒 Authentication Required</div>
+        <p style="font-size: 12px; margin-top: 4px;">You are currently browsing StockVault in <strong>Guest Mode</strong>. Please sign in or launch a free Demo account to execute trades via AI Copilot.</p>
+      `);
+      this.authService.openAuthModal('login', `Sign in to execute AI automated trade: Sell ${qty} ${ticker}.`);
+      return;
+    }
     const total = qty * price;
     const holding = this.holdings.find(h => h.ticker.toUpperCase() === ticker.toUpperCase());
 

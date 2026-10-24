@@ -13,6 +13,7 @@ import { BuySellModalComponent, ModalMode } from '../../shared/buy-sell-modal/bu
 import { RouterModule, Router } from '@angular/router';
 import { createChart, IChartApi, ISeriesApi, Time, AreaSeries } from 'lightweight-charts';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { AuthService } from '../../core/services/auth.service';
 
 interface EnrichedHolding extends Holding {
   currentPrice: number;
@@ -370,7 +371,8 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
     private cashService: CashService,
     private livePrice: LivePriceService,
     private logoService: LogoService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   getLogoUrl(ticker: string): string | null {
@@ -1039,6 +1041,10 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Cash Balance Drawer Controls ──
   openCashDrawer(mode: 'deposit' | 'withdraw'): void {
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openAuthModal('login', `Sign in or create an account to ${mode} funds to your portfolio.`);
+      return;
+    }
     this.cashDrawerMode = mode;
     this.cashAmount = null;
     this.cashDrawerError = '';
@@ -1223,6 +1229,10 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openModal(mode: ModalMode, h: EnrichedHolding): void {
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openAuthModal('login', `Sign in or create an account to ${mode === 'buy' ? 'purchase' : 'sell'} shares of ${h.ticker}.`);
+      return;
+    }
     this.modalMode = mode;
     this.modalTicker = h.ticker;
     this.modalCompany = h.company;

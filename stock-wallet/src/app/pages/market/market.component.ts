@@ -10,6 +10,7 @@ import { forkJoin, Subscription } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LivePriceService } from '../../core/services/live-price.service';
+import { AuthService } from '../../core/services/auth.service';
 
 const POPULAR = [
   { ticker: 'AAPL',  company: 'Apple Inc.',          sector: 'Technology' },
@@ -130,7 +131,8 @@ export class MarketComponent implements OnInit, OnDestroy {
     private finnhub: FinnhubService,
     private portfolioApi: PortfolioApiService,
     private logoService: LogoService,
-    private livePrice: LivePriceService
+    private livePrice: LivePriceService,
+    private authService: AuthService
   ) {}
 
   getLogoUrl(ticker: string): string | null {
@@ -446,6 +448,10 @@ export class MarketComponent implements OnInit, OnDestroy {
   }
 
   openBuy(stock: MarketStock): void {
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openAuthModal('login', `Sign in or create an account to purchase ${stock.ticker} (${stock.company}).`);
+      return;
+    }
     this.modalTicker = stock.ticker;
     this.modalCompany = stock.company;
     this.showModal = true;

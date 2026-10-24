@@ -10,6 +10,7 @@ import { LivePriceService } from '../../core/services/live-price.service';
 import { CashService } from '../../core/services/cash.service';
 import { FinnhubQuote, FinnhubProfile, FinnhubNewsArticle } from '../../core/models/models';
 import { LogoService } from '../../core/services/logo.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -94,7 +95,8 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     private notifications: NotificationService,
     private livePrice: LivePriceService,
     private cashService: CashService,
-    private logoService: LogoService
+    private logoService: LogoService,
+    private authService: AuthService
   ) {}
 
   getLogoUrl(ticker: string): string | null {
@@ -680,6 +682,10 @@ export class StockDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   submitOrder(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openAuthModal('login', `Sign in or create an account to place ${this.orderMode === 'buy' ? 'buy' : 'sell'} orders for ${this.ticker}.`);
+      return;
+    }
     this.tradeError = '';
     this.tradeSuccess = '';
     if (!this.orderQuantity || this.orderQuantity < 1) {

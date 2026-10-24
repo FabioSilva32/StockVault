@@ -7,10 +7,13 @@ import { AiCopilotComponent } from './shared/ai-copilot/ai-copilot.component';
 import { CommandPaletteComponent } from './shared/command-palette/command-palette.component';
 import { KeyboardShortcutService } from './core/services/keyboard-shortcut.service';
 
+import { TickerTapeComponent } from './core/ticker-tape/ticker-tape.component';
+import { AuthModalComponent } from './shared/auth-modal/auth-modal.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent, NotificationsComponent, AiCopilotComponent, CommandPaletteComponent],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, NotificationsComponent, AiCopilotComponent, CommandPaletteComponent, TickerTapeComponent, AuthModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
