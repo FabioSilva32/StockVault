@@ -18,6 +18,8 @@ export interface AuthModalState {
   reason?: string;
 }
 
+import { CashService } from './cash.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,7 +37,10 @@ export class AuthService {
   });
   public authModalState$: Observable<AuthModalState> = this.authModalStateSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cashService: CashService
+  ) {}
 
   public get currentUser(): AuthUser | null {
     return this.currentUserSubject.value;
@@ -132,6 +137,7 @@ export class AuthService {
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.TOKEN_KEY);
     this.currentUserSubject.next(null);
+    this.cashService.reloadForCurrentUser();
   }
 
   private storeSession(user: AuthUser, token: string): void {
@@ -142,6 +148,7 @@ export class AuthService {
       console.warn('Could not persist auth session to localStorage', e);
     }
     this.currentUserSubject.next(user);
+    this.cashService.reloadForCurrentUser();
     this.closeAuthModal();
   }
 

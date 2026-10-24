@@ -112,6 +112,29 @@ interface TickerItem {
       color: rgba(255, 255, 255, 0.12);
       margin-left: 8px;
     }
+
+    /* ─── Light Mode Overrides ─── */
+    :host-context(.theme-light) .ticker-wrapper,
+    :host-context([data-theme="light"]) .ticker-wrapper {
+      background: #f1f5f9;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .ticker-item,
+    :host-context([data-theme="light"]) .ticker-item {
+      color: #64748b;
+    }
+    :host-context(.theme-light) .ticker-symbol,
+    :host-context([data-theme="light"]) .ticker-symbol {
+      color: #0f172a;
+    }
+    :host-context(.theme-light) .ticker-price,
+    :host-context([data-theme="light"]) .ticker-price {
+      color: #1e293b;
+    }
+    :host-context(.theme-light) .ticker-sep,
+    :host-context([data-theme="light"]) .ticker-sep {
+      color: rgba(0, 0, 0, 0.15);
+    }
   `]
 })
 export class TickerTapeComponent implements OnInit, OnDestroy {

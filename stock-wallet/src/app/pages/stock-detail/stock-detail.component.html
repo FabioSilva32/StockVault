@@ -186,14 +186,14 @@
             <input type="number" [(ngModel)]="customPrice" [placeholder]="currentPrice" min="0.01" step="0.01" style="width:130px; text-align: right;" />
           </div>
 
-          <div class="trade-row" style="font-size: 13px; color: #94a3b8; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 10px;">
+          <div class="trade-row" style="font-size: 13px; color: var(--text-secondary); border-top: 1px dashed var(--border); padding-top: 10px;">
             <span>Available Buying Power</span>
-            <strong class="mono-num" style="color: #f1f5f9;">${{ cashBalance | number:'1.2-2' }}</strong>
+            <strong class="mono-num" style="color: var(--text-primary);">${{ cashBalance | number:'1.2-2' }}</strong>
           </div>
           <div class="quantity-row">
             <div class="quantity-label">
-              <span style="color:#94a3b8;font-size:13px">Quantity</span>
-              <strong style="color:#f1f5f9;font-size:16px;font-weight:700">{{ orderQuantity }} shares</strong>
+              <span style="color:var(--text-secondary);font-size:13px">Quantity</span>
+              <strong style="color:var(--text-primary);font-size:16px;font-weight:700">{{ orderQuantity }} shares</strong>
             </div>
             <input type="range" min="1" max="100" [(ngModel)]="orderQuantity" />
           </div>
@@ -321,11 +321,11 @@
         </div>
         
         <div style="display:flex;gap:8px;margin-bottom:12px">
-          <select [(ngModel)]="alertCondition" style="flex:1.2;background:rgba(255,255,255,0.03);color:#f1f5f9;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;font-size:13px;outline:none;cursor:pointer">
+          <select [(ngModel)]="alertCondition" style="flex:1.2;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;outline:none;cursor:pointer">
             <option value="above">Goes Above (≥)</option>
             <option value="below">Goes Below (≤)</option>
           </select>
-          <input type="number" [(ngModel)]="alertPrice" placeholder="Price" style="width:100px;background:rgba(255,255,255,0.03);color:#f1f5f9;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;font-size:13px;outline:none" />
+          <input type="number" [(ngModel)]="alertPrice" placeholder="Price" style="width:100px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;outline:none" />
           <button class="btn btn-primary" (click)="addAlert()" style="padding: 10px 16px; font-size:13px; font-weight:700; border-radius:10px; justify-content:center">Set</button>
         </div>
 
@@ -340,11 +340,11 @@
         </div>
 
         <div class="alerts-list">
-          <div *ngIf="activeAlerts.length === 0" style="color:#475569;font-size:12px;text-align:center;padding:12px;background:rgba(255,255,255,0.01);border-radius:8px;border:1px dashed rgba(255,255,255,0.03)">
+          <div *ngIf="activeAlerts.length === 0" style="color:var(--text-muted);font-size:12px;text-align:center;padding:12px;background:var(--bg-card);border-radius:8px;border:1px dashed var(--border)">
             No active target alerts set.
           </div>
-          <div class="alert-item" *ngFor="let alert of activeAlerts; let i = index" [style.opacity]="alert.triggered ? 0.6 : 1" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);margin-bottom:8px;font-size:13px">
-            <span style="color:#f1f5f9;font-weight:600">
+          <div class="alert-item" *ngFor="let alert of activeAlerts; let i = index" [style.opacity]="alert.triggered ? 0.6 : 1" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);margin-bottom:8px;font-size:13px">
+            <span style="color:var(--text-primary);font-weight:600">
               {{ alert.condition === 'above' ? '📈 ≥' : '📉 ≤' }} ${{ alert.price | number:'1.2-2' }}
             </span>
             <div style="display:flex;align-items:center;gap:10px">

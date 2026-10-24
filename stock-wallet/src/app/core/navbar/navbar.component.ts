@@ -531,6 +531,141 @@ import { AuthService, AuthUser } from '../services/auth.service';
         background: rgba(14, 165, 233, 0.08);
       }
     }
+
+    /* ─── Light Mode Overrides ─── */
+    :host-context(.theme-light) .navbar,
+    :host-context([data-theme="light"]) .navbar {
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+    :host-context(.theme-light) .brand-name,
+    :host-context([data-theme="light"]) .brand-name {
+      color: #0f172a;
+    }
+    :host-context(.theme-light) .nav-link,
+    :host-context([data-theme="light"]) .nav-link {
+      color: #475569;
+    }
+    :host-context(.theme-light) .nav-link:hover,
+    :host-context([data-theme="light"]) .nav-link:hover {
+      color: #0f172a;
+      background: rgba(0, 0, 0, 0.04);
+    }
+    :host-context(.theme-light) .nav-link.active,
+    :host-context([data-theme="light"]) .nav-link.active {
+      color: #0284c7;
+      background: rgba(14, 165, 233, 0.12);
+    }
+    :host-context(.theme-light) .live-clock,
+    :host-context([data-theme="light"]) .live-clock {
+      color: #475569;
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .market-status,
+    :host-context([data-theme="light"]) .market-status {
+      color: #475569;
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .lang-segment,
+    :host-context([data-theme="light"]) .lang-segment {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .lang-tab.active,
+    :host-context([data-theme="light"]) .lang-tab.active {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .theme-toggle,
+    :host-context([data-theme="light"]) .theme-toggle {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: #475569;
+    }
+    :host-context(.theme-light) .theme-toggle:hover,
+    :host-context([data-theme="light"]) .theme-toggle:hover {
+      background: rgba(0, 0, 0, 0.07);
+      color: #0f172a;
+    }
+    :host-context(.theme-light) .signin-btn,
+    :host-context([data-theme="light"]) .signin-btn {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #0f172a;
+    }
+    :host-context(.theme-light) .signin-btn:hover,
+    :host-context([data-theme="light"]) .signin-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .user-pill,
+    :host-context([data-theme="light"]) .user-pill {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    :host-context(.theme-light) .user-pill:hover,
+    :host-context([data-theme="light"]) .user-pill:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    :host-context(.theme-light) .user-name,
+    :host-context([data-theme="light"]) .user-name {
+      color: #0f172a;
+    }
+    :host-context(.theme-light) .user-dropdown,
+    :host-context([data-theme="light"]) .user-dropdown {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.1);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+    }
+    :host-context(.theme-light) .dropdown-name,
+    :host-context([data-theme="light"]) .dropdown-name {
+      color: #0f172a;
+    }
+    :host-context(.theme-light) .dropdown-email,
+    :host-context([data-theme="light"]) .dropdown-email {
+      color: #64748b;
+    }
+    :host-context(.theme-light) .dropdown-balance,
+    :host-context([data-theme="light"]) .dropdown-balance {
+      color: #475569;
+    }
+    :host-context(.theme-light) .dropdown-divider,
+    :host-context([data-theme="light"]) .dropdown-divider {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    :host-context(.theme-light) .dropdown-item,
+    :host-context([data-theme="light"]) .dropdown-item {
+      color: #334155;
+    }
+    :host-context(.theme-light) .dropdown-item:hover,
+    :host-context([data-theme="light"]) .dropdown-item:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: #0284c7;
+    }
+    :host-context(.theme-light) .hamburger,
+    :host-context([data-theme="light"]) .hamburger {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .hamburger span,
+    :host-context([data-theme="light"]) .hamburger span {
+      background: #475569;
+    }
+    :host-context(.theme-light) .mobile-menu,
+    :host-context([data-theme="light"]) .mobile-menu {
+      background: #ffffff;
+      border-top-color: rgba(0, 0, 0, 0.08);
+    }
+    :host-context(.theme-light) .mobile-nav-link,
+    :host-context([data-theme="light"]) .mobile-nav-link {
+      color: #475569;
+    }
+    :host-context(.theme-light) .mobile-nav-link.active,
+    :host-context([data-theme="light"]) .mobile-nav-link.active {
+      color: #0284c7;
+      background: rgba(14, 165, 233, 0.08);
+    }
   `]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
@@ -611,7 +746,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private applyTheme(): void {
-    document.body.classList.toggle('theme-light', !this.isDark);
+    const isLight = !this.isDark;
+    document.documentElement.classList.toggle('theme-light', isLight);
+    document.body.classList.toggle('theme-light', isLight);
+    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+    document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
   }
 
   private updateClock(): void {

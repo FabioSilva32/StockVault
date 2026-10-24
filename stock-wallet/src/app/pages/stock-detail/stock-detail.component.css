@@ -21,7 +21,7 @@
   padding: 6px 0;
 }
 
-.back-btn:hover { color: #f1f5f9; }
+.back-btn:hover { color: var(--text-primary); }
 
 /* Stock header */
 .stock-header {
@@ -63,7 +63,7 @@
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin: 0 0 4px;
 }
 
@@ -157,7 +157,7 @@
 }
 
 .quote-summary strong {
-  color: #f1f5f9;
+  color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -180,7 +180,7 @@
 .chart-title {
   font-size: 16px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .chart-actions {
@@ -204,9 +204,9 @@
 
 .chart-mode-btn.active,
 .chart-mode-btn:hover {
-  background: rgba(255,255,255,0.1);
-  color: #f1f5f9;
-  border-color: rgba(255,255,255,0.14);
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .chart-mode-btn.active {
@@ -267,9 +267,9 @@
 }
 
 .tf-btn.active {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.12);
-  color: #f1f5f9;
+  background: var(--bg-card-active);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .tf-btn:hover:not(.active) {
@@ -331,7 +331,7 @@
 }
 
 .stat-value {
-  color: #f1f5f9;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -414,9 +414,9 @@
   width: 100%;
   padding: 11px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.04);
-  color: #f1f5f9;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
   font-size: 14px;
   font-family: 'Inter', sans-serif;
   outline: none;
@@ -547,7 +547,7 @@
   font-size: 14.5px;
   font-weight: 700;
   margin-bottom: 8px;
-  color: #f1f5f9;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
@@ -660,7 +660,7 @@
 }
 
 .segment-btn:hover:not(:disabled) {
-  color: #f1f5f9 !important;
+  color: var(--text-primary) !important;
   background: rgba(255, 255, 255, 0.04) !important;
 }
 
@@ -702,9 +702,9 @@
 }
 
 .chart-mode-btn.indicator-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .chart-mode-btn.indicator-btn.active {
@@ -765,7 +765,7 @@
   font-family: 'Inter', sans-serif;
 }
 .segment-btn:hover {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 .segment-btn.active {
   color: #38bdf8;

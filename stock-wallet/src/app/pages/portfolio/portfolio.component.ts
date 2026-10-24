@@ -364,6 +364,7 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
   toastMsg = '';
   toastType: 'success' | 'error' = 'success';
   toastTimer: any;
+  private authSub?: Subscription;
 
   constructor(
     private portfolioApi: PortfolioApiService,
@@ -405,6 +406,9 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadPortfolioHistory(this.selectedTimeframe);
       }
     });
+    this.authSub = this.authService.currentUser$.subscribe(() => {
+      this.loadData();
+    });
     this.loadData();
   }
 
@@ -416,6 +420,7 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resizeObserver?.disconnect();
     this.chart?.remove();
     this.cashSub?.unsubscribe();
+    this.authSub?.unsubscribe();
     this.unsubscribeFromLivePrices();
   }
 

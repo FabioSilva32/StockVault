@@ -19,14 +19,14 @@
 .tx-summary-value {
   font-size: 22px;
   font-weight: 800;
-  color: #f1f5f9;
+  color: var(--text-primary);
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 .tx-summary-divider {
   width: 1px;
   height: 48px;
-  background: rgba(255,255,255,0.06);
+  background: var(--border);
   margin: 0 24px;
   flex-shrink: 0;
 }
@@ -51,7 +51,7 @@
 .filter-label {
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   white-space: nowrap;
@@ -65,16 +65,16 @@
 .chip {
   padding: 5px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: 'Inter', sans-serif;
 }
-.chip:hover { background: rgba(255,255,255,0.06); color: #f1f5f9; }
+.chip:hover { background: var(--bg-card-hover); color: var(--text-primary); }
 .chip.active {
   background: rgba(14,165,233,0.12);
   color: #38bdf8;
@@ -95,23 +95,23 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 7px 14px;
   margin-left: auto;
-  color: #475569;
+  color: var(--text-muted);
 }
 .filter-search input {
   background: none;
   border: none;
   outline: none;
-  color: #f1f5f9;
+  color: var(--text-primary);
   font-size: 13px;
   font-family: 'Inter', sans-serif;
   width: 160px;
 }
-.filter-search input::placeholder { color: #475569; }
+.filter-search input::placeholder { color: var(--text-muted); }
 
 /* Table wrapper */
 .tx-table-wrap {
@@ -122,7 +122,7 @@
 .tx-skeleton {
   height: 56px;
   border-radius: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
 }
 
 .tx-table tbody tr.tx-row {
@@ -134,7 +134,7 @@
   cursor: pointer;
   user-select: none;
 }
-.sortable:hover { color: #94a3b8; }
+.sortable:hover { color: var(--text-secondary); }
 
 .sort-icon {
   display: inline-block;
@@ -152,11 +152,11 @@
 .tx-date-day {
   font-size: 13px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 .tx-date-time {
   font-size: 11px;
-  color: #475569;
+  color: var(--text-muted);
   font-family: 'JetBrains Mono', monospace;
   margin-top: 1px;
 }
